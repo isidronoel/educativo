@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dibujo Técnico Industrial | Plataforma Interactiva</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Librería html2pdf para descargar reporte en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Librería MathJax para renderizado correcto de LaTeX y caracteres especiales -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card-border: rgba(255, 255, 255, 0.1);
+            --primary: #0284c7;
+            --primary-light: #38bdf8;
+            --accent: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #050811;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Modal de Login / Datos Alumno */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .modal-box h2 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--code-bg);
+            border: 1px solid var(--bg-card-border);
+            color: var(--text-main);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Header / Navbar */
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--bg-card-border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .user-badge {
+            font-size: 0.85rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            max-width: 100%;
+            padding-bottom: 0.2rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--text-main);
+            background: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 12px rgba(2, 132, 199, 0.4);
+        }
+
+        .tab-btn.diag-btn {
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .tab-btn.diag-btn:hover {
+            background: rgba(251, 146, 60, 0.15);
+        }
+
+        .tab-btn.quiz-btn {
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .tab-btn.quiz-btn:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        /* Layout Main */
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 5rem;
+            max-height: calc(100vh - 6rem);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.4rem;
+        }
+
+        .sidebar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Main Content */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .parcial-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .parcial-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards & Topic Sections */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analogy {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        .analogy strong {
+            color: var(--accent);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--bg-card-border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+        }
+
+        /* Quiz Styles */
+        .quiz-question {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .quiz-question p {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .quiz-option input[type="radio"] {
+            accent-color: var(--accent);
+        }
+
+        .quiz-result-box {
+            background: var(--code-bg);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Buttons & Utility */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-green {
+            background: #10b981;
+        }
+
+        .btn-green:hover {
+            background: #059669;
+        }
+
+        .report-card {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .report-card h2, .report-card h3 {
+            color: #0284c7;
+        }
+
+        .report-card table {
+            color: #0f172a;
+        }
+
+        .report-card th {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .report-card td, .report-card th {
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        /* Simulación Interactiva Isométrica */
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .canvas-box {
+            background: #050811;
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--bg-card-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #reportPrintArea, #reportPrintArea * {
+                visibility: visible;
+            }
+            #reportPrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                color: #000;
+                background: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal de Identificación -->
+    <div id="userModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>📐 Registro de Alumno</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">
+                Ingresa tus datos para registrar tus evaluaciones y generar tus reportes académicos de Dibujo Técnico.
+            </p>
+            <div class="input-group">
+                <label for="inputNombre">Nombre Completo:</label>
+                <input type="text" id="inputNombre" placeholder="Ej. Juan Pérez González">
+            </div>
+            <button class="btn" style="width: 100%; margin-top: 0.5rem;" onclick="saveUserData()">Iniciar Plataforma</button>
+        </div>
+    </div>
+
+    <!-- Header / Nav -->
+    <header>
+        <div class="logo">
+            📐 Draft<span>Academy</span>
+        </div>
+        <div id="userDisplay" class="user-badge">Alumno: No registrado</div>
+        <nav>
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag1', this)">🔍 Diag P1</button>
+            <button class="tab-btn active" onclick="switchParcial('parcial1', this)">Parcial 1</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz1', this)">📝 Examen P1</button>
+
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag2', this)">🔍 Diag P2</button>
+            <button class="tab-btn" onclick="switchParcial('parcial2', this)">Parcial 2</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz2', this)">📝 Examen P2</button>
+
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag3', this)">🔍 Diag P3</button>
+            <button class="tab-btn" onclick="switchParcial('parcial3', this)">Parcial 3</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz3', this)">📝 Examen P3</button>
+
+            <button class="tab-btn" onclick="switchParcial('repaso', this)">⭐ CAD / Visor 3D</button>
+            <button class="tab-btn" onclick="switchParcial('glosario', this)">📖 Glosario</button>
+            <button class="tab-btn" onclick="switchParcial('reporte', this)">📊 Reporte / PDF</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Dinámico -->
+        <aside class="sidebar">
+            <h3 id="sidebar-title">Temario Parcial 1</h3>
+            <ul id="sidebar-list"></ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 1 -->
+            <div id="diag1" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 1</h2>
+                    <p>Cuestionario previo sobre conceptos generales de dibujo, instrumentos, líneas y geometría básica.</p>
+                </div>
+                <form id="formDiag1" class="card">
+                    <div id="diag1-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(1)">Calcular Diagnóstico Parcial 1</button>
+                    <div id="resultDiag1" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 1 -->
+            <div id="parcial1" class="parcial-content active">
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <h1 style="color: var(--accent); font-size: 1.6rem;">Parcial 1 – Antecedentes Generales y Fundamentos de Dibujo Técnico</h1>
+                    <p>Estudio de los principios universales del dibujo técnico, normalización de líneas, rotulación, escalas, acotaciones y elementos fundamentales de la geometría en el plano.</p>
+                </div>
+
+                <section id="p1-11" class="card">
+                    <h2>1.1 Conceptualización del Dibujo</h2>
+                    <p>El <strong>dibujo técnico</strong> es un sistema de representación gráfica de objetos reales o ideados que proporciona información suficiente para facilitar su análisis, diseño, construcción y mantenimiento.</p>
+                    <div class="analogy">
+                        💡 <strong>Breve historia del dibujo:</strong> Desde las primeras manifestaciones rupestres para transmitir ideas, pasando por el uso de la geometría descriptiva perfeccionada por Gaspard Monge en el siglo XVIII, hasta la estandarización industrial moderna (ISO/ANSI) y el diseño asistido por computadora (CAD).
+                    </div>
+                </section>
+
+                <section id="p1-12" class="card">
+                    <h2>1.2 Herramientas e Instrumentos para Dibujo Técnico</h2>
+                    <p>Para la ejecución precisa de planos se emplean instrumentos tradicionales como la regla T, escuadras (30°-60° y 45°), compás, estilógrafos, escalímetro y plantillas, así como software especializado CAD en entornos digitales.</p>
+                </section>
+
+                <section id="p1-121" class="card">
+                    <h2>1.2.1 Líneas Normalizadas</h2>
+                    <p>Las líneas normalizadas constituyen el "alfabeto gráfico" del dibujo industrial. Cada tipo de línea posee un grosor y estilo específico para transmitir un significado unívoco:</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Línea</th>
+                                    <th>Apariencia</th>
+                                    <th>Aplicación Principal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Continua Gruesa</strong></td>
+                                    <td>───</td>
+                                    <td>Contornos y aristas visibles de la pieza.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Trazo Trazo (Oculta)</strong></td>
+                                    <td>- - - -</td>
+                                    <td>Contornos y aristas no visibles (ocultas).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fina de Cadena (Ejes)</strong></td>
+                                    <td>─ ─ ─ ─</td>
+                                    <td>Ejes de simetría, centros de círculos y cilindros.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Continua Fina</strong></td>
+                                    <td>─────</td>
+                                    <td>Líneas de cota, aux. de cota y rayados de corte.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="p1-122" class="card">
+                    <h2>1.2.2 Caligrafía Técnica</h2>
+                    <p>La <strong>rotulación o caligrafía técnica</strong> garantiza una lectura uniforme e inconfundible de las anotaciones de un plano. Debe ser legible, uniforme y normalizada (según la norma ISO 3098).</p>
+                    <ul>
+                        <li><strong>Relaciones y características:</strong> La altura nominal ($h$) de la letra mayúscula determina la proporción. Las alturas estándar son 2.5 mm, 3.5 mm, 5 mm, 7 mm y 10 mm.</li>
+                        <li><strong>Procedimiento:</strong> Se dibujan líneas guía horizontales muy finas (líneas de guía) para mantener alineación y altura constante. Se mantiene una inclinación vertical a 90° o cursiva normalizada a 75°.</li>
+                        <li><strong>Observaciones generales:</strong> El espacio entre caracteres debe ser constante y el grosor del trazo proporcional a la altura.</li>
+                    </ul>
+                </section>
+
+                <section id="p1-123" class="card">
+                    <h2>1.2.3 Escalas y Acotaciones</h2>
+                    <p>La <strong>escala</strong> es la relación matemática entre las dimensiones del dibujo en el plano y las dimensiones reales del objeto.</p>
+                    $$\text{Escala} = \frac{\text{Medida en el dibujo}}{\text{Medida real en el objeto}}$$
+                    <ul>
+                        <li><strong>Escala Natural (1:1):</strong> Las dimensiones del dibujo son idénticas a las reales.</li>
+                        <li><strong>Escala de Ampliación (ej. 2:1, 5:1, 10:1):</strong> El dibujo es más grande que el objeto real (útil para piezas muy pequeñas o de precisión).</li>
+                        <li><strong>Escala de Reducción (ej. 1:2, 1:5, 1:100):</strong> El dibujo es más pequeño que el objeto real (utilizado en piezas grandes, estructuras y arquitectura).</li>
+                    </ul>
+                </section>
+
+                <section id="p1-124" class="card">
+                    <h2>1.2.4 Acotación</h2>
+                    <p>La <strong>acotación</strong> es el conjunto de líneas, cifras y símbolos con que se indican las medidas reales de una pieza sobre el plano, independientemente de la escala empleada.</p>
+                </section>
+
+                <section id="p1-125" class="card">
+                    <h2>1.2.5 Líneas de Referencia</h2>
+                    <p>Las <strong>líneas auxiliares de cota (o de referencia)</strong> son líneas finas continuas que parten del contorno de la pieza de forma perpendicular al elemento a medir, delimitando la longitud acotada.</p>
+                </section>
+
+                <section id="p1-126" class="card">
+                    <h2>1.2.6 Líneas de Acotación y Elementos</h2>
+                    <p>Constituidas por la línea de cota paralela a la dimensión medida, los remates en los extremos y la cifra de cota:</p>
+                    <ul>
+                        <li><strong>Cabezas de flecha:</strong> Puntas rellenas situadas en los extremos de la línea de cota que tocan las líneas de referencia.</li>
+                        <li><strong>Cota:</strong> Número que indica la medida real en milímetros (salvo otra especificación). Se ubica centrada y encima de la línea de cota.</li>
+                        <li><strong>Acotación de curvas y arcos:</strong> Se antepone el símbolo $R$ para radios o $\varnothing$ para diámetros completos.</li>
+                        <li><strong>Superficies inclinadas:</strong> Se acotan especificando el ángulo relativo o mediante las coordenadas X/Y de sus extremos.</li>
+                    </ul>
+                </section>
+
+                <section id="p1-131" class="card">
+                    <h2>1.3.1 Conceptos Geométricos Básicos</h2>
+                    <ul>
+                        <li><strong>Geometría:</strong> Rama de las matemáticas que estudia las propiedades de figuras en el plano o espacio.</li>
+                        <li><strong>Punto:</strong> Elemento adimensional que marca una posición exacta.</li>
+                        <li><strong>Posiciones de líneas entre sí:</strong> Paralelas (no se intersectan), Perpendiculares (forman 90°), Oblicuas o Secantes.</li>
+                        <li><strong>Posiciones respecto a la tierra:</strong> Horizontales (paralelas al nivel del suelo), Verticales (perpendiculares al nivel del suelo) e Inclinadas.</li>
+                        <li><strong>Ángulos:</strong> Región del plano comprendida entre dos semirrectas que se unen en un vértice común.</li>
+                    </ul>
+                </section>
+
+                <section id="p1-132" class="card">
+                    <h2>1.3.2 Clasificación de Ángulos por su Abertura</h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Ángulo</th>
+                                    <th>Abertura / Dimensión</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Agudo</strong></td><td>Menor a $90^\circ$ ($< 90^\circ$).</td></tr>
+                                <tr><td><strong>Recto</strong></td><td>Exactamente igual a $90^\circ$.</td></tr>
+                                <tr><td><strong>Obtuso</strong></td><td>Mayor a $90^\circ$ y menor a $180^\circ$.</td></tr>
+                                <tr><td><strong>Llano</strong></td><td>Exactamente $180^\circ$.</td></tr>
+                                <tr><td><strong>Perigonal / Completo</strong></td><td>Exactamente $360^\circ$.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="p1-133" class="card">
+                    <h2>1.3.3 Polígonos</h2>
+                    <p>Un <strong>polígono</strong> es una figura geométrica plana cerrada delimitada por tres o más segmentos rectos (lados). Se clasifican en <strong>Regulares</strong> (lados y ángulos iguales) e <strong>Irregulares</strong>.</p>
+                </section>
+
+                <section id="p1-134" class="card">
+                    <h2>1.3.4 El Círculo</h2>
+                    <p>El <strong>círculo</strong> es la superficie plana delimitada por una circunferencia (curva plana y cerrada cuyos puntos equidistan del centro).</p>
+                    <ul>
+                        <li><strong>Radio ($r$):</strong> Segmento desde el centro a cualquier punto de la circunferencia.</li>
+                        <li><strong>Diámetro ($d$):</strong> Segmento que une dos puntos pasando por el centro ($d = 2r$).</li>
+                        <li><strong>Cuerda:</strong> Segmento que une dos puntos de la circunferencia sin pasar necesariamente por el centro.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 1 -->
+            <div id="quiz1" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 1 (15 Preguntas)</h2>
+                    <p>Evaluación sumativa de fin de módulo sobre herramientas, líneas normalizadas, escalas, acotación y geometría.</p>
+                </div>
+                <form id="formQuiz1" class="card">
+                    <div id="quiz1-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(1)">Calcular Examen Parcial 1</button>
+                    <div id="resultQuiz1" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 2 -->
+            <div id="diag2" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 2</h2>
+                    <p>Cuestionario de entrada para evaluar nociones de vistas, proyecciones ortogonales e isométricas y cortes mecánicos.</p>
+                </div>
+                <form id="formDiag2" class="card">
+                    <div id="diag2-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(2)">Calcular Diagnóstico Parcial 2</button>
+                    <div id="resultDiag2" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 2 DETALLADO -->
+            <div id="parcial2" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <h1 style="color: var(--accent); font-size: 1.6rem;">Parcial 2 – Construcciones Geométricas Básicas y Proyecciones Ortogonales</h1>
+                    <p>Desarrollo de habilidades de representación tridimensional en planos bidimensionales mediante proyecciones, vistas ortogonales, dibujo isométrico y representación interior de elementos mecánicos con cortes y secciones.</p>
+                </div>
+
+                <section id="p2-vistas" class="card">
+                    <h2>1.1 Vistas</h2>
+                    <p>Las <strong>vistas</strong> son las proyecciones ortogonales de un objeto obtenidas al observarlo desde diferentes posiciones estándar de inspección. Permiten conocer de manera exacta las formas y dimensiones de la pieza sin distorsiones.</p>
+                </section>
+
+                <section id="p2-proyecciones" class="card">
+                    <h2>1.2 Proyecciones Ortogonales</h2>
+                    <p>La <strong>proyección ortogonal</strong> es el sistema de representación que proyecta líneas paralelas perpendiculares desde el objeto hacia un plano de proyección.</p>
+                    <ul>
+                        <li><strong>Base teórica:</strong> Se fundamenta en la proyección cilindrica ortogonal, ubicando el objeto dentro de un cubo ortogonal (caja de cristal). Los dos sistemas principales son:
+                            <br>• <strong>Sistema Europeo (Primer Cuadrante / ISO E):</strong> Objeto situado entre el observador y el plano.
+                            <br>• <strong>Sistema Americano (Tercer Cuadrante / ISO A):</strong> Plano situado entre el observador y el objeto.
+                        </li>
+                        <li><strong>Proyección Isométrica:</strong> Representación axonométrica tridimensional donde los tres ejes principales forman ángulos iguales de $120^\circ$ entre sí (o $30^\circ$ respecto a la horizontal).</li>
+                        <li><strong>Técnica para dibujo isométrico:</strong> Se parte de los tres ejes isométricos primarios, se traza la caja envolvente de la pieza y se proyectan aristas manteniendo el paralelismo.</li>
+                    </ul>
+                </section>
+
+                <section id="p2-cortes" class="card">
+                    <h2>1.3 Dibujo de Elementos Mecánicos con Secciones y Cortes</h2>
+                    <p>Permiten mostrar los detalles interiores complejos de una pieza evitando la acumulación confusa de líneas ocultas.</p>
+                    <ul>
+                        <li><strong>Cortes:</strong> Operación gráfica en la cual se supone que un plano imaginario pasa a través de la pieza, removiendo la parte anterior para dejar al descubierto el interior. La superficie cortada se raya con líneas finas a $45^\circ$.</li>
+                        <li><strong>Plano de Corte:</strong> Plano virtual que atraviesa la pieza. Se representa en las vistas mediante una línea gruesa de trazo y punto con flechas en las puntas marcando la dirección de visión.</li>
+                        <li><strong>Posición de los planos de corte:</strong> Pueden ser longitudinales, transversales, quebrados o parciales según los elementos interiores a resaltar.</li>
+                        <li><strong>Secciones:</strong> Muestran únicamente la superficie de intersección reducida que entra en contacto directo con el plano de corte (a diferencia del corte completo, que dibuja también el fondo).</li>
+                        <li><strong>Tipos de Secciones:</strong> Abatidas (giradas sobre la misma vista), desplazadas (fuera de la vista) y parciales.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 2 -->
+            <div id="quiz2" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 2 (15 Preguntas)</h2>
+                    <p>Examen sumativo de cierre sobre vistas ortogonales, isométrico, sistemas de proyección (ISO A/E), cortes y secciones.</p>
+                </div>
+                <form id="formQuiz2" class="card">
+                    <div id="quiz2-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(2)">Calcular Examen Parcial 2</button>
+                    <div id="resultQuiz2" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 3 -->
+            <div id="diag3" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 3</h2>
+                    <p>Cuestionario previo sobre interpretación de planos de conjunto, diagramas hidráulicos, neumáticos y simbología normalizada.</p>
+                </div>
+                <form id="formDiag3" class="card">
+                    <div id="diag3-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(3)">Calcular Diagnóstico Parcial 3</button>
+                    <div id="resultDiag3" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 3 DETALLADO -->
+            <div id="parcial3" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h1 style="color: var(--accent-green); font-size: 1.6rem;">Parcial 3 – Interpretación de Planos y Diagramas Industriales</h1>
+                    <p>Lectura experta de esquemas de ensamble, circuitos de potencia fluídica (neumática e hidráulica) y esquemas eléctricos/electrónicos normalizados en ingeniería.</p>
+                </div>
+
+                <section id="p3-11" class="card">
+                    <h2>1.1 Interpretación de Planos</h2>
+                    <p>La <strong>lectura de planos</strong> implica comprender la forma, dimensiones, tolerancias y especificaciones de fabricación a partir del análisis estructurado de un documento técnico.</p>
+                    <ul>
+                        <li><strong>Lectura de vistas y anotaciones:</strong> Asociación mental de las proyecciones ortogonales para reconstruir el objeto tridimensional e identificar las notas técnicas en el cuadro de datos o cajetín.</li>
+                        <li><strong>Planos de conjunto:</strong> Planos que representan la totalidad de una máquina o dispositivo ensamblado, indicando la posición relativa de cada pieza componente con marcas numéricas de posición (globos de lista de partes).</li>
+                    </ul>
+                </section>
+
+                <section id="p3-12" class="card">
+                    <h2>1.2 Diferentes Tipos de Dibujos de Conjunto</h2>
+                    <p>Representación esquemática de sistemas de transmisión de potencia por fluidos mediante simbología estandarizada:</p>
+                    <ul>
+                        <li><strong>Circuitos Hidráulicos:</strong> Utilizan fluido líquido incompresible (aceite mineral) a alta presión para transmisión de fuerzas elevadas. Se indican bombas, válvulas distribuidoras, cilindros y tanques.</li>
+                        <li><strong>Circuitos Neumáticos:</strong> Utilizan aire comprimido a presiones moderadas. Se esquematizan compresores, unidades de mantenimiento (FRL), válvulas de control direccional y actuadores neumáticos.</li>
+                    </ul>
+                </section>
+
+                <section id="p3-13" class="card">
+                    <h2>1.3 Simbología Eléctrica y Electrónica</h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Categoría de Componente</th>
+                                    <th>Símbolos Normalizados Frecuentes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Componentes Pasivos</strong></td>
+                                    <td>Resistencias (zig-zag / rectángulo), Capacitores (líneas paralelas), Inductores (bobina).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Componentes Activos</strong></td>
+                                    <td>Diodos (triángulo con barra), Transistores BJT/FET, Fuentes de voltaje DC/AC.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Símbolos Eléctricos Generales</strong></td>
+                                    <td>Interruptores, Relés, Fusibles, Tomas de Tierra y Motores trifásicos.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="p3-14" class="card">
+                    <h2>1.4 Simbología Neumática e Hidráulica</h2>
+                    <p>Representación esquemática bajo norma ISO 1219:</p>
+                    <ul>
+                        <li><strong>Cuadros de Válvulas:</strong> Cada posición de trabajo se representa por un cuadrado. Las flechas indican el sentido de flujo del fluido.</li>
+                        <li><strong>Actuadores:</strong> Rectángulos con embolo interno que representan cilindros de simple y doble efecto.</li>
+                        <li><strong>Líneas de conexión:</strong> Continuas para tuberías de trabajo de potencia, discontinuas para líneas de pilotaje o control.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 3 -->
+            <div id="quiz3" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 3 (15 Preguntas)</h2>
+                    <p>Examen sumativo final sobre lectura de planos de conjunto, esquemas neumático-hidráulicos y simbología eléctrica/electrónica.</p>
+                </div>
+                <form id="formQuiz3" class="card">
+                    <div id="quiz3-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(3)">Calcular Examen Parcial 3</button>
+                    <div id="resultQuiz3" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- REPASO & VISOR INTERACTIVO ISOMÉTRICO CAD -->
+            <div id="repaso" class="parcial-content">
+                <section class="card">
+                    <h2>📐 Visor Interactivo Isometric CAD & Proyección 3D</h2>
+                    <p>Demostración gráfica interactiva en tiempo real sobre la construcción geométrica isométrica de un bloque técnico mediante Canvas 2D/3D.</p>
+
+                    <div class="demo-container">
+                        <div class="canvas-box">
+                            <canvas id="cadCanvas" width="400" height="300"></canvas>
+                        </div>
+                        <p id="cadOutput" style="color: var(--accent); font-weight: bold;">Haz clic sobre el cubo para alternar la vista de contornos invisibles (Ocultas).</p>
+                        <button class="btn" onclick="toggleIsometricHiddenLines()">Alternar Aristas Ocultas</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- GLOSARIO DE TÉRMINOS -->
+            <div id="glosario" class="parcial-content">
+                <section class="card">
+                    <h2>📖 Glosario de Términos de Dibujo Técnico Industrial</h2>
+                    <p>Consulta rápida de conceptos fundamentales de la materia:</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Término</th>
+                                    <th>Concepto y Significado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Acotación</strong></td><td>Proceso de anotar las dimensiones reales en un dibujo técnico.</td></tr>
+                                <tr><td><strong>Escalímetro</strong></td><td>Regla graduada en distintas escalas proporcionales para lectura rápida.</td></tr>
+                                <tr><td><strong>Isométrico</strong></td><td>Proyección tridimensional en ejes separados a 120°.</td></tr>
+                                <tr><td><strong>Ortogonal</strong></td><td>Proyección perpendicular sobre planos principales de vista.</td></tr>
+                                <tr><td><strong>Plano de Corte</strong></td><td>Plano virtual que secciona un objeto para observar su interior.</td></tr>
+                                <tr><td><strong>Rayado de Corte</strong></td><td>Líneas finas paralelas a 45° que indican material cortado.</td></tr>
+                                <tr><td><strong>Sistema ISO A</strong></td><td>Sistema de proyección americano (Tercer Cuadrante).</td></tr>
+                                <tr><td><strong>Sistema ISO E</strong></td><td>Sistema de proyección europeo (Primer Cuadrante).</td></tr>
+                                <tr><td><strong>Válvula 3/2</strong></td><td>Válvula distribuidora neumática con 3 vías y 2 posiciones de trabajo.</td></tr>
+                                <tr><td><strong>FRL</strong></td><td>Unidad neumática de Mantenimiento (Filtro, Regulador y Lubricador).</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- REPORTE DE EXÁMENES Y PDF -->
+            <div id="reporte" class="parcial-content">
+                <div class="card">
+                    <h2>📊 Reporte Académico de Evaluaciones</h2>
+                    <p>Resultados detallados diferenciados entre Evaluaciones Diagnósticas y Exámenes Parciales.</p>
+                    <div class="btn-group" style="margin-top: 1rem;">
+                        <button class="btn" onclick="window.print()">🖨️ Imprimir Reporte</button>
+                        <button class="btn btn-green" onclick="generatePDF()">📄 Descargar Reporte PDF</button>
+                    </div>
+                </div>
+
+                <div id="reportPrintArea" class="report-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <h2 style="margin:0;">📐 DraftAcademy - Reporte Oficial</h2>
+                            <p style="margin:0; font-size: 0.9rem; color: #475569;">Plataforma Académica de Dibujo Técnico e Interpretación de Planos</p>
+                        </div>
+                        <div style="text-align: right; font-size: 0.85rem; color: #64748b;">
+                            Fecha: <span id="reportDate">--/--/----</span>
+                        </div>
+                    </div>
+
+                    <h3>📌 Información del Estudiante</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <tr>
+                                <td><strong>Nombre Alumno:</strong></td>
+                                <td id="repNombre">No registrado</td>
+                                <td><strong>Matrícula:</strong></td>
+                                <td id="repMatricula">N/A</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Grupo:</strong></td>
+                                <td id="repGrupo">N/A</td>
+                                <td><strong>Estatus:</strong></td>
+                                <td>Activo</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>🔍 Evaluaciones Diagnósticas (Entrada)</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Módulo</th>
+                                    <th>Aciertos</th>
+                                    <th>Diagnóstico (Base 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Diagnóstica Parcial 1</td>
+                                    <td id="repD1Score">0 / 5</td>
+                                    <td id="repD1Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnóstica Parcial 2</td>
+                                    <td id="repD2Score">0 / 5</td>
+                                    <td id="repD2Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnóstica Parcial 3</td>
+                                    <td id="repD3Score">0 / 5</td>
+                                    <td id="repD3Grade">0.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>📝 Exámenes Sumativos por Parcial (Cierre)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Evaluación</th>
+                                    <th>Aciertos</th>
+                                    <th>Calificación (Base 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Examen Parcial 1: Antecedentes y Geometría</td>
+                                    <td id="repP1Score">0 / 15</td>
+                                    <td id="repP1Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Examen Parcial 2: Vistas, Proyecciones y Cortes</td>
+                                    <td id="repP2Score">0 / 15</td>
+                                    <td id="repP2Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Examen Parcial 3: Planos de Conjunto y Simbología</td>
+                                    <td id="repP3Score">0 / 15</td>
+                                    <td id="repP3Grade">0.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 2px solid #0284c7; padding: 1.2rem; border-radius: 8px; margin-top: 1.5rem; text-align: center;">
+                        <h3 style="margin: 0; color: #0f172a;">PROMEDIO GENERAL DE EXÁMENES</h3>
+                        <p id="repPromedio" style="font-size: 2rem; font-weight: bold; color: #0284c7; margin: 0.5rem 0 0 0;">0.0 / 10</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Dibujo Técnico Industrial &copy; 2026 - Plataforma de Aprendizaje Interactivo</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        // Datos del Alumno y Puntuaciones Separadas
+        const userData = {
+            matricula: 'N/A',
+            nombre: '',
+            grupo: 'N/A',
+            diagScores: { 1: 0, 2: 0, 3: 0 },
+            quizScores: { 1: 0, 2: 0, 3: 0 }
+        };
+
+        function saveUserData() {
+            const nom = document.getElementById('inputNombre').value.trim();
+
+            if (!nom) {
+                alert('Por favor ingresa tu nombre completo.');
+                return;
+            }
+
+            userData.nombre = nom;
+            userData.matricula = 'N/A';
+            userData.grupo = 'N/A';
+
+            document.getElementById('userDisplay').textContent = `Alumno: ${nom}`;
+            document.getElementById('userModal').style.display = 'none';
+
+            updateReportTable();
+        }
+
+        // Sidebar Dinámica por Parcial
+        const sidebarContents = {
+            diag1: { title: "Diag P1", items: [{ name: "Cuestionario Entrada P1", link: "#formDiag1" }] },
+            parcial1: {
+                title: "Temario Parcial 1",
+                items: [
+                    { name: "1.1 Concepto de Dibujo", link: "#p1-11" },
+                    { name: "1.2 Herramientas", link: "#p1-12" },
+                    { name: "1.2.1 Líneas Normalizadas", link: "#p1-121" },
+                    { name: "1.2.2 Caligrafía Técnica", link: "#p1-122" },
+                    { name: "1.2.3 Escalas", link: "#p1-123" },
+                    { name: "1.2.4 Acotación", link: "#p1-124" },
+                    { name: "1.2.5 Líneas de Referencia", link: "#p1-125" },
+                    { name: "1.2.6 Elementos de Cota", link: "#p1-126" },
+                    { name: "1.3.1 Conceptos Geométricos", link: "#p1-131" },
+                    { name: "1.3.2 Ángulos", link: "#p1-132" },
+                    { name: "1.3.3 Polígonos", link: "#p1-133" },
+                    { name: "1.3.4 Círculo", link: "#p1-134" }
+                ]
+            },
+            quiz1: { title: "Examen P1", items: [{ name: "Ir al Examen P1", link: "#formQuiz1" }] },
+            
+            diag2: { title: "Diag P2", items: [{ name: "Cuestionario Entrada P2", link: "#formDiag2" }] },
+            parcial2: {
+                title: "Temario Parcial 2",
+                items: [
+                    { name: "1.1 Vistas Ortogonales", link: "#p2-vistas" },
+                    { name: "1.2 Proyecciones e Isométrico", link: "#p2-proyecciones" },
+                    { name: "1.3 Cortes y Secciones", link: "#p2-cortes" }
+                ]
+            },
+            quiz2: { title: "Examen P2", items: [{ name: "Ir al Examen P2", link: "#formQuiz2" }] },
+
+            diag3: { title: "Diag P3", items: [{ name: "Cuestionario Entrada P3", link: "#formDiag3" }] },
+            parcial3: {
+                title: "Temario Parcial 3",
+                items: [
+                    { name: "1.1 Interpretación de Planos", link: "#p3-11" },
+                    { name: "1.2 Circuitos Hidráulico/Neumático", link: "#p3-12" },
+                    { name: "1.3 Simbología Eléctrica", link: "#p3-13" },
+                    { name: "1.4 Simbología Neumática/Hidráulica", link: "#p3-14" }
+                ]
+            },
+            quiz3: { title: "Examen P3", items: [{ name: "Ir al Examen P3", link: "#formQuiz3" }] },
+
+            repaso: { title: "CAD / Visor 3D", items: [{ name: "Simulador Isométrico", link: "#repaso" }] },
+            glosario: { title: "Glosario", items: [{ name: "Términos Clave", link: "#glosario" }] },
+            reporte: { title: "Reportes", items: [{ name: "Resultados & PDF", link: "#reporte" }] }
+        };
+
+        function updateSidebar(tabId) {
+            const sidebarTitle = document.getElementById('sidebar-title');
+            const sidebarList = document.getElementById('sidebar-list');
+            const data = sidebarContents[tabId];
+
+            if (data && sidebarTitle && sidebarList) {
+                sidebarTitle.textContent = data.title;
+                sidebarList.innerHTML = '';
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${item.link}">${item.name}</a>`;
+                    sidebarList.appendChild(li);
+                });
+            }
+        }
+
+        // Banco de Diagnósticos (5 preguntas por parcial)
+        const diagQuestionsData = {
+            1: [
+                { q: "1. ¿Qué tipo de escala se utiliza cuando el dibujo se hace exactamente del mismo tamaño que la pieza real?", options: ["Escala de ampliación", "Escala natural (1:1)", "Escala de reducción", "Escala gráfica"], answer: 1 },
+                { q: "2. ¿Qué norma regula la caligrafía técnica en dibujo industrial?", options: ["ISO 3098 / DIN 16", "ISO 9001", "IEEE 802", "ANSI C"], answer: 0 },
+                { q: "3. Un ángulo de 90° exactos recibe el nombre de:", options: ["Agudo", "Obtuso", "Recto", "Llano"], answer: 2 },
+                { q: "4. ¿Qué línea normalizada se emplea para representar ejes de simetría?", options: ["Continua gruesa", "Fina de cadena (trazo y punto)", "Trazo discontinuo", "Zig-zag"], answer: 1 },
+                { q: "5. La distancia del centro de un círculo a cualquier punto de su circunferencia se llama:", options: ["Diámetro", "Cuerda", "Radio", "Secante"], answer: 2 }
+            ],
+            2: [
+                { q: "1. ¿Cuál es el ángulo que forman los ejes isométricos con la horizontal?", options: ["45°", "60°", "30°", "90°"], answer: 2 },
+                { q: "2. Las aristas y contornos no visibles se representan mediante líneas de tipo:", options: ["Continua fina", "Trazo discontinuo (oculta)", "Punto y trazo", "Línea ondulada"], answer: 1 },
+                { q: "3. ¿En qué sistema de proyección el plano de proyección está entre el observador y el objeto?", options: ["Sistema Europeo (ISO E)", "Sistema Americano (ISO A)", "Proyección Oblicua", "Perspectiva Cónica"], answer: 1 },
+                { q: "4. Un corte mecánico se realiza para:", options: ["Reducir el peso del plano", "Mostrar el interior oculto de la pieza", "Cambiar el material de fabricación", "Eliminar las cotas"], answer: 1 },
+                { q: "5. ¿A qué ángulo estándar se trazan las líneas de rayado de corte?", options: ["30°", "45°", "60°", "90°"], answer: 1 }
+            ],
+            3: [
+                { q: "1. ¿Qué representa la sigla FRL en circuitos neumáticos?", options: ["Fuerza, Rendimiento, Límite", "Filtro, Regulador, Lubricador", "Flujo, Presión, Lubricación", "Fuente, Relevador, Línea"], answer: 1 },
+                { q: "2. En un plano de conjunto, los números encerrados en círculos conectados a las piezas son llamados:", options: ["Marcas o globos de posición", "Cotas de ensamble", "Vistas de detalle", "Ejes primarios"], answer: 0 },
+                { q: "3. ¿Qué componente eléctrico pasivo se representa generalmente con una línea en zig-zag o rectángulo?", options: ["Diodo", "Resistencia", "Transistor", "Condensador"], answer: 1 },
+                { q: "4. Las tuberías principales de trabajo en diagramas neumáticos se representan con líneas:", options: ["Ocultas", "Continuas", "Discontinuas de puntos", "De eje"], answer: 1 },
+                { q: "5. ¿Qué fluido se utiliza de forma estándar en circuitos de potencia hidráulicos?", options: ["Aire comprimido", "Aceite incompresible", "Agua destilada", "Gas nitrógeno"], answer: 1 }
+            ]
+        };
+
+        // Banco de Exámenes Parciales (15 preguntas sumativas por parcial)
+        const quizQuestionsData = {
+            1: [
+                { q: "1. ¿Cuál es el objetivo primordial del dibujo técnico?", options: ["Crear arte abstracto", "Representar objetos con precisión matemática e información para su fabricación", "Decorar catálogos comerciales", "Sustituir la fotografía"], answer: 1 },
+                { q: "2. ¿Quién desarrolló los principios teóricos de la Geometría Descriptiva moderna?", options: ["James Gosling", "Gaspard Monge", "Leonardo da Vinci", "Isaac Newton"], answer: 1 },
+                { q: "3. La línea continua gruesa se utiliza para dibujar:", options: ["Líneas de cota", "Contornos y aristas visibles", "Ejes de simetría", "Líneas de rayado"], answer: 1 },
+                { q: "4. Si una pieza de 50 mm reales se dibuja de 100 mm en el plano, ¿qué escala se usó?", options: ["1:2", "2:1", "1:1", "1:50"], answer: 1 },
+                { q: "5. ¿Cuál es el valor del ángulo de un triángulo equilátero en cada uno de sus vértices?", options: ["45°", "60°", "90°", "120°"], answer: 1 },
+                { q: "6. La línea fina de cadena (trazo y punto) se emplea para:", options: ["Ejes de simetría y centros", "Líneas ocultas", "Cortes de sección", "Rotulación"], answer: 0 },
+                { q: "7. ¿Qué símbolo precede al valor numérico al acotar un radio?", options: ["Ø", "R", "rad", "SØ"], answer: 1 },
+                { q: "8. ¿Qué tipo de ángulo mide más de 90° y menos de 180°?", options: ["Agudo", "Recto", "Obtuso", "Llano"], answer: 2 },
+                { q: "9. ¿Cómo se denomina al segmento que une dos puntos de una circunferencia sin pasar obligatoriamente por el centro?", options: ["Radio", "Cuerda", "Tangente", "Arco"], answer: 1 },
+                { q: "10. La acotación en un plano debe expresarse por defecto en la unidad de:", options: ["Centímetros (cm)", "Milímetros (mm)", "Pulgadas (in)", "Metros (m)"], answer: 1 },
+                { q: "11. ¿Cuál es el valor del ángulo completo perigonal?", options: ["180°", "270°", "360°", "90°"], answer: 2 },
+                { q: "12. En la rotulación normalizada, las líneas de guía finas sirven para:", options: ["Decorar las notas", "Garantizar la altura y alineación uniforme del texto", "Marcar el plano de corte", "Definir la escala"], answer: 1 },
+                { q: "13. Un polígono de 6 lados iguales se denomina:", options: ["Pentágono", "Hexágono regular", "Heptágono", "Octágono"], answer: 1 },
+                { q: "14. La escala 1:100 se clasifica como una escala de:", options: ["Ampliación", "Reducción", "Natural", "Exponencial"], answer: 1 },
+                { q: "15. ¿Qué elemento de la acotación indica el valor numérico dimensionado?", options: ["Línea auxiliar", "Cabeza de flecha", "Cifra de cota", "Punto de origen"], answer: 2 }
+            ],
+            2: [
+                { q: "1. Las tres vistas principales de una pieza en el sistema de proyección ortogonal son:", options: ["Frontal (Alzado), Superior (Planta) y Lateral", "Isométrica, Cónica y Oblicua", "Corte, Sección y Detalle", "Norte, Sur y Este"], answer: 0 },
+                { q: "2. En el Sistema Americano (ISO A), la vista superior (planta) se ubica:", options: ["Debajo de la vista frontal", "Arriba de la vista frontal", "A la derecha del alzado", "Detrás de la pieza"], answer: 1 },
+                { q: "3. En una proyección isométrica, los ejes x, y, z se encuentran separados a un ángulo de:", options: ["90°", "120°", "45°", "180°"], answer: 1 },
+                { q: "4. ¿Qué distingue a una Sección de un Corte?", options: ["La sección muestra solo la superficie de contacto con el plano de corte; el corte muestra además el fondo", "La sección es siempre en 3D", "El corte no usa rayado a 45°", "Son idénticos"], answer: 0 },
+                { q: "5. Las líneas de trazo discontinuo se usan para indicar:", options: ["Contornos visibles", "Aristas no visibles / ocultas", "Rayados de corte", "Ejes de rotación"], answer: 1 },
+                { q: "6. El plano de corte se representa gráficamente con:", options: ["Línea fina continua", "Línea gruesa de trazo y punto con flechas de dirección", "Línea ondulada fina", "Trazo doble discontinuo"], answer: 1 },
+                { q: "7. ¿Cuál es el objetivo principal de realizar un dibujo en proyección isométrica?", options: ["Obtener cotas de fabricación directamente", "Facilitar la visualización tridimensional del objeto", "Reducir el tamaño de la hoja", "Calcular el peso del material"], answer: 1 },
+                { q: "8. En el Sistema Europeo (ISO E), la vista superior se proyecta:", options: ["Debajo de la vista frontal", "Arriba de la vista frontal", "A la izquierda", "En perspectiva"], answer: 0 },
+                { q: "9. ¿Qué ángulo tienen las líneas del rayado de corte respecto a los ejes principales de la pieza?", options: ["30°", "45°", "60°", "15°"], answer: 1 },
+                { q: "10. Una sección abatida es aquella que se dibuja:", options: ["Fuera del dibujo principal", "Girada 90° sobre la misma vista del plano de corte", "En una hoja aparte", "A escala ampliada"], answer: 1 },
+                { q: "11. ¿Cuál de las siguientes vistas nos da las dimensiones de ancho y alto de la pieza?", options: ["Vista Superior (Planta)", "Vista Frontal (Alzado)", "Vista Inferior", "Vista Posterior"], answer: 1 },
+                { q: "12. La proyección ortogonal se basa en rayos de proyección que son entre sí:", options: ["Perpendiculares y paralelos", "Convergentes a un punto focal", "Divergentes a 45°", "Aleatorios"], answer: 0 },
+                { q: "13. ¿Qué tipo de corte abarca la mitad exacta de la pieza mediante dos planos perpendiculares?", options: ["Corte Total", "Semicorte o Medio Corte", "Corte Parcial / Marcado", "Corte Quebrado"], answer: 1 },
+                { q: "14. En un dibujo técnico, las aristas que coinciden entre una línea continua visible y una oculta, ¿cuál prevalece?", options: ["La línea oculta", "La línea continua visible", "La línea de eje", "Cualquiera"], answer: 1 },
+                { q: "15. La técnica para dibujar círculos en isométrica implica construir:", options: ["Esferas libres", "Óvalos isométricos mediante arcos de compás en un rombo envolvente", "Cuadrados rectos", "Círculos perfectos sin deformación"], answer: 1 }
+            ],
+            3: [
+                { q: "1. Un plano de conjunto tiene como función principal:", options: ["Mostrar una sola pieza aislada para torneado", "Mostrar la posición relativa de todas las partes ensambladas en un mecanismo", "Indicar el costo económico de la máquina", "Mostrar solo el circuito eléctrico"], answer: 1 },
+                { q: "2. En simbología neumática, un cuadrado representa:", options: ["Un cilindro de doble efecto", "Una posición de trabajo de una válvula", "Un filtro de aire", "Un tubo de escape"], answer: 1 },
+                { q: "3. ¿Qué símbolo eléctrico representa a un componente activo que permite el paso de corriente en un solo sentido?", options: ["Resistencia", "Condensador", "Diodo semiconductor", "Inductancia"], answer: 2 },
+                { q: "4. Una válvula neumática clasificada como '3/2' indica que posee:", options: ["3 posiciones y 2 vías", "3 vías de conexión y 2 posiciones de trabajo", "3 cilindros y 2 reguladores", "3 bares y 2 litros"], answer: 1 },
+                { q: "5. ¿Qué elemento hidráulico convierte la energía de presión del fluido en movimiento mecánico rectilíneo?", options: ["Bomba hidráulica", "Cilindro hidráulico (actuador)", "Manómetro", "Filtro de retorno"], answer: 1 },
+                { q: "6. En esquemas neumáticos, una línea continua gruesa representa:", options: ["Línea de escape libre", "Tubería principal de trabajo", "Línea de pilotaje secundario", "Línea eléctrica"], answer: 1 },
+                { q: "7. ¿Qué símbolo representa la masa o conexión a tierra en un diagrama electrónico?", options: ["Un círculo con una X", "Líneas horizontales decrecientes en forma de triángulo invertido", "Una flecha en diagonal", "Un cuadrado cerrado"], answer: 1 },
+                { q: "8. La lista de materiales o partes adjunta a un plano de conjunto contiene:", options: ["Número de marca, cantidad, denominación y material de la pieza", "Nombre del dibujante únicamente", "Cotas de tolerancia", "Manual de usuario"], answer: 0 },
+                { q: "9. ¿Qué tipo de accionamiento en una válvula se representa con una palanca o pedal?", options: ["Accionamiento eléctrico (solenoide)", "Accionamiento manual", "Accionamiento neumático puro", "Accionamiento térmico"], answer: 1 },
+                { q: "10. ¿Cuál es el propósito del lubricador en una unidad de mantenimiento neumática (FRL)?", options: ["Enfriar el aire comprimido", "Inyectar una niebla fina de aceite para reducir rozamiento en válvulas y cilindros", "Filtrar el agua", "Aumentar la presión"], answer: 1 },
+                { q: "11. En simbología eléctrica, un interruptor Abierto representa:", options: ["Circuito cerrado con paso de corriente", "Circuito interrumpido sin paso de corriente", "Un cortocircuito", "Una bobina"], answer: 1 },
+                { q: "12. La simbología neumática e hidráulica internacional está estandarizada por la norma:", options: ["ISO 1219", "ISO 9000", "IEEE 802.3", "DIN 1"], answer: 0 },
+                { q: "13. ¿Qué diferencia principal existe entre un diagrama neumático y uno hidráulico?", options: ["El tipo de fluido (aire comprimido vs aceite líquido a alta presión)", "No existen diferencias", "La hidráulica no usa válvulas", "La neumática no requiere tuberías"], answer: 0 },
+                { q: "14. Un condensador o capacitor eléctrico se utiliza principalmente para:", options: ["Oponerse al paso de la corriente", "Almacenar energía en forma de campo eléctrico", "Transformar voltaje AC a DC", "Generar calor"], answer: 1 },
+                { q: "15. La lectura correcta de anotaciones en planos exige consultar el cajetín para conocer:", options: ["Escala, unidades, tolerancias generales y fechas de revisión", "El costo de la obra", "El salario de los operarios", "La dirección de la fábrica"], answer: 0 }
+            ]
+        };
+
+        function renderAllForms() {
+            // Render Diagnósticos
+            for (let p = 1; p <= 3; p++) {
+                const container = document.getElementById(`diag${p}-questions`);
+                if (!container) continue;
+                container.innerHTML = '';
+
+                diagQuestionsData[p].forEach((qData, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let optionsHTML = '';
+                    qData.options.forEach((opt, optIdx) => {
+                        optionsHTML += `
+                            <label class="quiz-option">
+                                <input type="radio" name="d${p}_q${index}" value="${optIdx}">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${optionsHTML}</div>`;
+                    container.appendChild(qDiv);
+                });
+            }
+
+            // Render Exámenes
+            for (let p = 1; p <= 3; p++) {
+                const container = document.getElementById(`quiz${p}-questions`);
+                if (!container) continue;
+                container.innerHTML = '';
+
+                quizQuestionsData[p].forEach((qData, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let optionsHTML = '';
+                    qData.options.forEach((opt, optIdx) => {
+                        optionsHTML += `
+                            <label class="quiz-option">
+                                <input type="radio" name="p${p}_q${index}" value="${optIdx}">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${optionsHTML}</div>`;
+                    container.appendChild(qDiv);
+                });
+            }
+        }
+
+        function evaluateDiag(pNum) {
+            const data = diagQuestionsData[pNum];
+            let score = 0;
+            data.forEach((qData, index) => {
+                const selected = document.querySelector(`input[name="d${pNum}_q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qData.answer) {
+                    score++;
+                }
+            });
+
+            userData.diagScores[pNum] = score;
+
+            const resultBox = document.getElementById(`resultDiag${pNum}`);
+            resultBox.style.display = 'block';
+            const grade = ((score / data.length) * 10).toFixed(1);
+            resultBox.innerHTML = `
+                <h3>Resultados Diagnóstico Parcial ${pNum}: ${score} / ${data.length} (${grade}/10)</h3>
+                <p>Resultado guardado para medir tus conocimientos previos de este módulo.</p>
+            `;
+
+            updateReportTable();
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function evaluateQuiz(pNum) {
+            const data = quizQuestionsData[pNum];
+            let score = 0;
+            data.forEach((qData, index) => {
+                const selected = document.querySelector(`input[name="p${pNum}_q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qData.answer) {
+                    score++;
+                }
+            });
+
+            userData.quizScores[pNum] = score;
+
+            const resultBox = document.getElementById(`resultQuiz${pNum}`);
+            resultBox.style.display = 'block';
+            const grade = ((score / data.length) * 10).toFixed(1);
+            resultBox.innerHTML = `
+                <h3>Calificación Examen Parcial ${pNum}: ${score} / ${data.length} (${grade}/10)</h3>
+                <p>Examen sumativo registrado exitosamente.</p>
+            `;
+
+            updateReportTable();
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateReportTable() {
+            document.getElementById('repNombre').textContent = userData.nombre || 'No registrado';
+            document.getElementById('repMatricula').textContent = userData.matricula || 'N/A';
+            document.getElementById('repGrupo').textContent = userData.grupo || 'N/A';
+
+            const d = new Date();
+            document.getElementById('reportDate').textContent = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+
+            // Actualizar Diagnósticos
+            const d1 = userData.diagScores[1];
+            const d2 = userData.diagScores[2];
+            const d3 = userData.diagScores[3];
+
+            document.getElementById('repD1Score').textContent = `${d1} / 5`;
+            document.getElementById('repD2Score').textContent = `${d2} / 5`;
+            document.getElementById('repD3Score').textContent = `${d3} / 5`;
+
+            document.getElementById('repD1Grade').textContent = ((d1 / 5) * 10).toFixed(1);
+            document.getElementById('repD2Grade').textContent = ((d2 / 5) * 10).toFixed(1);
+            document.getElementById('repD3Grade').textContent = ((d3 / 5) * 10).toFixed(1);
+
+            // Actualizar Exámenes
+            const q1 = userData.quizScores[1];
+            const q2 = userData.quizScores[2];
+            const q3 = userData.quizScores[3];
+
+            document.getElementById('repP1Score').textContent = `${q1} / 15`;
+            document.getElementById('repP2Score').textContent = `${q2} / 15`;
+            document.getElementById('repP3Score').textContent = `${q3} / 15`;
+
+            const g1 = ((q1 / 15) * 10).toFixed(1);
+            const g2 = ((q2 / 15) * 10).toFixed(1);
+            const g3 = ((q3 / 15) * 10).toFixed(1);
+
+            document.getElementById('repP1Grade').textContent = g1;
+            document.getElementById('repP2Grade').textContent = g2;
+            document.getElementById('repP3Grade').textContent = g3;
+
+            const prom = ((parseFloat(g1) + parseFloat(g2) + parseFloat(g3)) / 3).toFixed(1);
+            document.getElementById('repPromedio').textContent = `${prom} / 10`;
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('reportPrintArea');
+            const opt = {
+                margin:       0.5,
+                filename:     `Reporte_DibujoTecnico_${userData.nombre.replace(/\s+/g, '_') || 'Alumno'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Simulación Canvas Dibujo Isométrico
+        let showHidden = false;
+
+        function drawIsometricCube() {
+            const canvas = document.getElementById('cadCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cx = 200, cy = 180, size = 80;
+            const dx = size * Math.cos(Math.PI / 6); // 30 deg
+            const dy = size * Math.sin(Math.PI / 6);
+
+            // Puntos frontales e isométricos
+            const p0 = [cx, cy];
+            const p1 = [cx + dx, cy - dy];
+            const p2 = [cx, cy - 2 * dy];
+            const p3 = [cx - dx, cy - dy];
+
+            const p4 = [cx, cy + size];
+            const p5 = [cx + dx, cy + size - dy];
+            const p6 = [cx - dx, cy + size - dy];
+
+            // Caras visibles (Línea gruesa continua)
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+
+            // Cara superior
+            ctx.beginPath();
+            ctx.moveTo(...p0); ctx.lineTo(...p1); ctx.lineTo(...p2); ctx.lineTo(...p3); ctx.closePath();
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+            ctx.fill();
+            ctx.stroke();
+
+            // Cara derecha
+            ctx.beginPath();
+            ctx.moveTo(...p0); ctx.lineTo(...p1); ctx.lineTo(...p5); ctx.lineTo(...p4); ctx.closePath();
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+            ctx.fill();
+            ctx.stroke();
+
+            // Cara izquierda
+            ctx.beginPath();
+            ctx.moveTo(...p0); ctx.lineTo(...p3); ctx.lineTo(...p6); ctx.lineTo(...p4); ctx.closePath();
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.05)';
+            ctx.fill();
+            ctx.stroke();
+
+            // Aristas Ocultas (Línea de trazos discontinuos)
+            if (showHidden) {
+                const pBack = [cx, cy + size - 2 * dy];
+                ctx.strokeStyle = '#fb923c';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([5, 5]);
+
+                ctx.beginPath();
+                ctx.moveTo(...p2); ctx.lineTo(...pBack);
+                ctx.moveTo(...p5); ctx.lineTo(...pBack);
+                ctx.moveTo(...p6); ctx.lineTo(...pBack);
+                ctx.stroke();
+
+                ctx.setLineDash([]); // Reset
+            }
+        }
+
+        function toggleIsometricHiddenLines() {
+            showHidden = !showHidden;
+            drawIsometricCube();
+            document.getElementById('cadOutput').textContent = showHidden ?
+                '👁️ Aristas ocultas (líneas discontinuas naranjas) ACTIVADAS.' :
+                '👁️ Aristas ocultas DESACTIVADAS.';
+        }
+
+        function switchParcial(id, btn) {
+            const contents = document.querySelectorAll('.parcial-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+
+            updateSidebar(id);
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+
+            if (id === 'repaso') {
+                setTimeout(drawIsometricCube, 100);
+            }
+        }
+
+        window.onload = function() {
+            renderAllForms();
+            updateSidebar('parcial1');
+        };
+    </script>
+</body>
+</html>

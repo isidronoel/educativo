@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma Académica de Estadística y Probabilidad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.85);
+            --bg-card-border: rgba(255, 255, 255, 0.1);
+            --primary: #0284c7;
+            --primary-light: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #050811;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; line-height: 1.6; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: var(--bg-card); border: 1px solid var(--primary-light);
+            padding: 2rem; border-radius: 12px; width: 90%; max-width: 420px;
+        }
+        .modal-box h2 { color: var(--primary-light); margin-bottom: 1rem; text-align: center; }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+        .input-group input {
+            width: 100%; padding: 0.6rem; background: var(--code-bg);
+            border: 1px solid var(--bg-card-border); color: var(--text-main); border-radius: 6px; outline: none;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.95); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--bg-card-border); padding: 0.8rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+        }
+        .logo { font-weight: 700; font-size: 1.2rem; }
+        .logo span { color: var(--primary-light); }
+        .user-badge { font-size: 0.85rem; background: rgba(56, 189, 248, 0.1); border: 1px solid var(--primary-light); padding: 0.3rem 0.8rem; border-radius: 20px; color: var(--primary-light); }
+
+        nav { display: flex; gap: 0.3rem; overflow-x: auto; max-width: 100%; padding-bottom: 0.2rem; }
+        .tab-btn {
+            background: transparent; border: 1px solid transparent; color: var(--text-muted);
+            padding: 0.4rem 0.7rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.82rem;
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+        .tab-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+        .tab-btn.active { color: var(--text-main); background: var(--primary); border-color: var(--primary-light); }
+
+        .container { display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; max-width: 1400px; margin: 0 auto; padding: 1.5rem; flex: 1; width: 100%; }
+        .sidebar { background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: 12px; padding: 1rem; height: fit-content; position: sticky; top: 5rem; }
+        .sidebar h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--primary-light); margin-bottom: 0.8rem; }
+        .sidebar ul { list-style: none; }
+        .sidebar a { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; display: block; padding: 0.3rem 0.5rem; border-radius: 6px; }
+        .sidebar a:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+
+        .parcial-content { display: none; }
+        .parcial-content.active { display: block; }
+        .card { background: var(--bg-card); border: 1px solid var(--bg-card-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h2 { color: var(--primary-light); font-size: 1.3rem; margin-bottom: 0.8rem; border-bottom: 1px solid var(--bg-card-border); padding-bottom: 0.4rem; }
+        .card h3 { color: var(--accent-green); font-size: 1.05rem; margin: 1.2rem 0 0.5rem 0; }
+        .card h4 { color: var(--primary-light); font-size: 0.95rem; margin: 0.8rem 0 0.3rem 0; }
+        .card p, .card ul, .card ol { font-size: 0.92rem; margin-bottom: 0.6rem; color: #e2e8f0; }
+        .card ul, .card ol { margin-left: 1.4rem; }
+
+        .formula-box { background: var(--code-bg); border-left: 4px solid var(--primary-light); padding: 0.8rem; border-radius: 6px; margin: 0.8rem 0; font-size: 0.9rem; overflow-x: auto; }
+        .example-box { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .example-box h4 { color: var(--primary-light); margin-top: 0; }
+
+        .quiz-question { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--bg-card-border); border-radius: 8px; padding: 1rem; margin-bottom: 0.8rem; }
+        .quiz-question p { font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.3rem; }
+        .quiz-option { display: flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.03); padding: 0.4rem 0.7rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+
+        .btn { background: var(--primary); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.88rem; }
+        .btn:hover { background: var(--primary-light); }
+        .btn-green { background: #10b981; } .btn-orange { background: #f97316; }
+
+        .quiz-toggle-box { display: none; margin-top: 1rem; }
+        .quiz-result-box { background: var(--code-bg); border: 1px solid var(--primary-light); border-radius: 8px; padding: 1rem; margin-top: 1rem; display: none; }
+
+        .report-card { background: #ffffff; color: #0f172a; padding: 2rem; border-radius: 8px; }
+        .report-card table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .report-card th, .report-card td { padding: 0.5rem; border: 1px solid #cbd5e1; text-align: left; font-size: 0.85rem; }
+        .report-card th { background: #f1f5f9; }
+
+        .sim-container { background: var(--code-bg); border: 1px solid var(--bg-card-border); border-radius: 8px; padding: 1rem; margin: 1rem 0; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
+        canvas { background: #020617; border: 1px solid var(--primary-light); border-radius: 6px; max-width: 100%; }
+
+        @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } .sidebar { display: none; } }
+    </style>
+</head>
+<body>
+
+    <div id="userModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>📊 Registro de Alumno</h2>
+            <div class="input-group">
+                <label>Matrícula:</label>
+                <input type="text" id="inputMatricula" placeholder="Ej. 202600123">
+            </div>
+            <div class="input-group">
+                <label>Nombre Completo:</label>
+                <input type="text" id="inputNombre" placeholder="Ej. Ana María Torres">
+            </div>
+            <div class="input-group">
+                <label>Grupo:</label>
+                <input type="text" id="inputGrupo" placeholder="Ej. EST-301">
+            </div>
+            <button class="btn" style="width: 100%;" onclick="saveUserData()">Ingresar a la Plataforma</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">📈 Stat<span>Academy</span></div>
+        <div id="userDisplay" class="user-badge">Alumno: No registrado</div>
+        <nav>
+            <button class="tab-btn active" onclick="switchTab('diag', this)">🩺 Diagnóstico</button>
+            <button class="tab-btn" onclick="switchTab('u1', this)">U1. Descriptiva</button>
+            <button class="tab-btn" onclick="switchTab('u2', this)">U2. Probabilidad</button>
+            <button class="tab-btn" onclick="switchTab('u3', this)">U3. Var. Aleatorias</button>
+            <button class="tab-btn" onclick="switchTab('u4', this)">U4. Distribuciones</button>
+            <button class="tab-btn" onclick="switchTab('u5', this)">U5. Regresión</button>
+            <button class="tab-btn" onclick="switchTab('u6', this)">U6. Est. Aplicada</button>
+            <button class="tab-btn" onclick="switchTab('lab', this)">🧪 Laboratorio</button>
+            <button class="tab-btn" onclick="switchTab('examen', this)">📝 Examen Final</button>
+            <button class="tab-btn" onclick="switchTab('reporte', this)">📊 Reporte PDF</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3 id="sidebar-title">Evaluación Diagnóstica</h3>
+            <ul id="sidebar-list"></ul>
+        </aside>
+
+        <main>
+            <!-- DIAGNÓSTICO -->
+            <div id="diag" class="parcial-content active">
+                <div class="card">
+                    <h2>🩺 Evaluación Diagnóstica Inicial</h2>
+                    <p>Cuestionario de exploración general para conocer tu nivel inicial de competencias matemáticas y razonamiento cuantitativo.</p>
+                </div>
+                <div class="card">
+                    <div id="diag-quiz-container"></div>
+                    <button class="btn btn-orange" onclick="evaluateDiagQuiz()">Calcular Evaluación Diagnóstica</button>
+                    <div id="diag-result" class="quiz-result-box"></div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 1 -->
+            <div id="u1" class="parcial-content">
+                <div class="card" id="u1-teoria">
+                    <h2>Unidad 1: Estadística Descriptiva</h2>
+                    
+                    <h3>1.1 Conceptos Básicos de Estadística</h3>
+                    <p><strong>Definición:</strong> La Estadística es la ciencia matemática que se encarga de recolectar, organizar, resumir, analizar e interpretar datos para la toma de decisiones efectivas bajo condiciones de incertidumbre.</p>
+                    <p><strong>Teoría de Decisión:</strong> Enfoque formal que combina probabilidades con valores numéricos de consecuencias (utilidades) para seleccionar la mejor estrategia posible ante escenarios de riesgo.</p>
+                    <p><strong>Población:</strong> Conjunto completo de todos los elementos, individuos u objetos que comparten una característica común medible de interés.</p>
+                    <p><strong>Muestra Aleatoria:</strong> Subconjunto representativo seleccionado de la población, donde cada elemento tiene una probabilidad conocida y no nula de ser elegido.</p>
+                    <p><strong>Parámetros y Estadísticos:</strong> Un <em>Parámetro</em> es una medida numérica fija que describe una característica de toda la población (ej. \(\mu\), \(\sigma^2\)). Un <em>Estadístico</em> es una variable aleatoria calculada a partir de los datos muestrales (ej. \(\bar{x}\), \(s^2\)).</p>
+
+                    <h3>1.2 Descripción de Datos</h3>
+                    <p><strong>Datos No Agrupados:</strong> Conjunto de mediciones directas tal como se recolectaron, adecuado para muestras pequeñas (\(n < 30\)).</p>
+                    <p><strong>Datos Agrupados:</strong> Organización de datos cuantitativos en clases o intervalos mutuamente excluyentes, necesaria para grandes conjuntos de datos.</p>
+                    <p><strong>Componentes de la Tabla de Frecuencias:</strong></p>
+                    <ul>
+                        <li><strong>Frecuencia de Clase (\(f_i\)):</strong> Número total de observaciones pertenecientes a un intervalo determinado.</li>
+                        <li><strong>Frecuencia Relativa (\(f_{ri}\)):</strong> Proporción de observaciones en la clase: \(f_{ri} = \frac{f_i}{n}\).</li>
+                        <li><strong>Punto Medio o Marca de Clase (\(X_i\)):</strong> Valor central del intervalo: \(X_i = \frac{L_{inf} + L_{sup}}{2}\).</li>
+                        <li><strong>Límites Reales de Clase:</strong> Fronteras continuas calculadas para eliminar vacíos entre intervalos adyacentes.</li>
+                    </ul>
+
+                    <h3>1.3 Medidas de Tendencia Central y Dispersión</h3>
+                    <div class="formula-box">
+                        $$\text{Media Aritmética Muestral: } \bar{x} = \frac{\sum_{i=1}^{n} x_i}{n}$$
+                        $$\text{Media Geométrica: } MG = \sqrt[n]{x_1 \cdot x_2 \cdot \dots \cdot x_n}$$
+                        $$\text{Media Ponderada: } \bar{x}_w = \frac{\sum (w_i \cdot x_i)}{\sum w_i}$$
+                        $$\text{Varianza Muestral: } s^2 = \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n - 1}$$
+                        $$\text{Desviación Estándar Muestral: } s = \sqrt{s^2}$$
+                        $$\text{Desviación Media: } DM = \frac{\sum |x_i - \bar{x}|}{n} \quad | \quad \text{Desviación Mediana: } DMed = \frac{\sum |x_i - Med|}{n}$$
+                    </div>
+
+                    <h3>1.4 Parámetros para Datos Agrupados</h3>
+                    <div class="formula-box">
+                        $$\text{Media Agrupada: } \bar{x} = \frac{\sum (f_i \cdot X_i)}{n}$$
+                        $$\text{Mediana Agrupada: } Med = L_i + \left( \frac{\frac{n}{2} - F_{i-1}}{f_i} \right) \cdot A$$
+                        $$\text{Moda Agrupada: } Mo = L_i + \left( \frac{\Delta_1}{\Delta_1 + \Delta_2} \right) \cdot A \quad \text{donde } \Delta_1 = f_i - f_{i-1}, \, \Delta_2 = f_i - f_{i+1}$$
+                        $$\text{Varianza Agrupada: } s^2 = \frac{\sum f_i (X_i - \bar{x})^2}{n - 1}$$
+                    </div>
+
+                    <h3>1.5 Distribución de Frecuencias</h3>
+                    <p>Estructura tabular que condensa los datos tabulando la frecuencia absoluta (\(f_i\)), frecuencia acumulada (\(F_i\)), frecuencia relativa (\(f_{ri}\)) y frecuencia relativa acumulada (\(F_{ri}\)). Permite construir histogramas, polígonos de frecuencia y ojivas.</p>
+
+                    <h3>1.6 Técnicas de Agrupación de Datos</h3>
+                    <ol>
+                        <li>Calcular el Rango Total: \(R = X_{max} - X_{min}\).</li>
+                        <li>Determinar el número de clases (\(k\)) mediante la Regla de Sturges: \(k = 1 + 3.322 \log_{10}(n)\).</li>
+                        <li>Calcular la Amplitud de Clase (\(A\)): \(A = \frac{R}{k}\) (redondeado hacia arriba).</li>
+                        <li>Establecer límites de clase y marcas de clase (\(X_i\)).</li>
+                    </ol>
+
+                    <h3>1.7 Técnicas de Muestreo</h3>
+                    <ul>
+                        <li><strong>Muestreo Aleatorio Simple (MAS):</strong> Cada elemento tiene igual probabilidad de selección.</li>
+                        <li><strong>Muestreo Sistemático:</strong> Selección de cada \(k\)-ésimo elemento tras una sustracción aleatoria inicial (\(k = N/n\)).</li>
+                        <li><strong>Muestreo Estratificado:</strong> La población se divide en estratos homogéneos y se muestrea aleatoriamente dentro de cada uno.</li>
+                        <li><strong>Muestreo por Conglomerados:</strong> División en subgrupos heterogéneos representativos; se eligen conglomerados completos al azar.</li>
+                    </ul>
+                </div>
+
+                <div class="card" id="u1-ejemplos">
+                    <h2>📐 Problemas Resueltos Paso a Paso - Unidad 1</h2>
+
+                    <div class="example-box">
+                        <h4>Problema 1: Cálculo de Medidas para Datos No Agrupados</h4>
+                        <p><strong>Enunciado:</strong> Dado el siguiente conjunto de datos muestrales del tiempo de procesamiento (en segundos) de una máquina: \(12, 15, 18, 12, 20, 25, 18, 12\). Calcula la media, mediana, moda, varianza y desviación estándar.</p>
+                        <p><strong>Paso 1: Ordenamiento de datos.</strong></p>
+                        <p>\(12, 12, 12, 15, 18, 18, 20, 25\) con \(n = 8\).</p>
+                        <p><strong>Paso 2: Media Aritmética.</strong></p>
+                        <p>$$\bar{x} = \frac{12+12+12+15+18+18+20+25}{8} = \frac{132}{8} = 16.5 \text{ seg}$$</p>
+                        <p><strong>Paso 3: Mediana y Moda.</strong></p>
+                        <p>Al ser \(n=8\) par, promediamos las posiciones 4 y 5: \(Med = \frac{15 + 18}{2} = 16.5 \text{ seg}\). La Moda es \(12 \text{ seg}\) (frecuencia = 3).</p>
+                        <p><strong>Paso 4: Varianza Muestral (\(s^2\)).</strong></p>
+                        <p>$$\sum (x_i - \bar{x})^2 = (12-16.5)^2 \times 3 + (15-16.5)^2 + (18-16.5)^2 \times 2 + (20-16.5)^2 + (25-16.5)^2$$</p>
+                        <p>$$= 3(20.25) + 2.25 + 2(2.25) + 12.25 + 72.25 = 60.75 + 2.25 + 4.5 + 12.25 + 72.25 = 152$$</p>
+                        <p>$$s^2 = \frac{152}{8 - 1} = \frac{152}{7} \approx 21.71 \text{ seg}^2$$</p>
+                        <p><strong>Paso 5: Desviación Estándar (\(s\)).</strong></p>
+                        <p>$$s = \sqrt{21.71} \approx 4.66 \text{ seg}$$</p>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>Problema 2: Construcción de Tabla de Frecuencias y Media Agrupada</h4>
+                        <p><strong>Enunciado:</strong> Se analiza una muestra de \(n = 40\) observaciones. Datos: \(X_{min} = 50\), \(X_{max} = 98\). Construye los parámetros de agrupación y calcula la media estimada.</p>
+                        <p><strong>Paso 1: Cálculo del Rango (\(R\)).</strong></p>
+                        <p>$$R = 98 - 50 = 48$$</p>
+                        <p><strong>Paso 2: Número de Clases (\(k\)) por Regla de Sturges.</strong></p>
+                        <p>$$k = 1 + 3.322 \log_{10}(40) = 1 + 3.322(1.602) = 1 + 5.32 = 6.32 \rightarrow k = 6 \text{ clases}$$</p>
+                        <p><strong>Paso 3: Amplitud de Clase (\(A\)).</strong></p>
+                        <p>$$A = \frac{R}{k} = \frac{48}{6} = 8$$</p>
+                        <p><strong>Paso 4: Cálculo de Marca de Clase y Media Agrupada.</strong></p>
+                        <p>Si la primera clase es \([50, 58)\), su marca de clase es \(X_1 = \frac{50+58}{2} = 54\). Supongamos las frecuencias \(f_i = [5, 9, 12, 8, 4, 2]\).</p>
+                        <p>$$\sum (f_i \cdot X_i) = (5 \times 54) + (9 \times 62) + (12 \times 70) + (8 \times 78) + (4 \times 86) + (2 \times 94)$$</p>
+                        <p>$$= 270 + 558 + 840 + 624 + 344 + 188 = 2824$$</p>
+                        <p>$$\bar{x} = \frac{2824}{40} = 70.6$$</p>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>Problema 3: Cálculo de la Mediana en Datos Agrupados</h4>
+                        <p><strong>Enunciado:</strong> Usando la tabla del ejercicio anterior con \(n = 40\), donde la clase medianil (donde la frecuencia acumulada alcanza \(n/2 = 20\)) es el intervalo \([66, 74)\) con \(L_i = 66\), \(f_i = 12\), frecuencia acumulada previa \(F_{i-1} = 14\), y amplitud \(A = 8\). Calcula la Mediana exactos.</p>
+                        <p><strong>Paso 1: Aplicación de la fórmula de Mediana Agrupada.</strong></p>
+                        <p>$$Med = L_i + \left( \frac{\frac{n}{2} - F_{i-1}}{f_i} \right) \cdot A$$</p>
+                        <p><strong>Paso 2: Sustitución de valores.</strong></p>
+                        <p>$$Med = 66 + \left( \frac{20 - 14}{12} \right) \cdot 8 = 66 + \left( \frac{6}{12} \right) \cdot 8 = 66 + 0.5 \cdot 8 = 66 + 4 = 70.0$$</p>
+                    </div>
+                </div>
+
+                <div class="card" id="u1-examen">
+                    <h2>📝 Examen de Evaluación - Unidad 1</h2>
+                    <button class="btn btn-orange" onclick="toggleQuiz('u1-quiz-box')">🚀 Desplegar Examen Unidad 1 (20 Preguntas)</button>
+                    <div id="u1-quiz-box" class="quiz-toggle-box">
+                        <div id="u1-quiz-container"></div>
+                        <button class="btn btn-green" onclick="evaluateUnitQuiz('u1', 20)">Calcular Nota Unidad 1</button>
+                        <div id="u1-result" class="quiz-result-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 2 -->
+            <div id="u2" class="parcial-content">
+                <div class="card" id="u2-teoria">
+                    <h2>Unidad 2: Fundamentos de la Teoría de Probabilidad</h2>
+                    
+                    <h3>2.1 Técnicas de Conteo</h3>
+                    <p><strong>Principio Aditivo:</strong> Si un evento \(A\) puede ocurrir de \(m\) maneras y un evento \(B\) de \(n\) maneras (mutuamente excluyentes), la elección de \(A\) o \(B\) ocurre de \(m + n\) maneras.</p>
+                    <p><strong>Principio Multiplicativo:</strong> Si una operación consta de dos etapas donde la primera ofrece \(m\) opciones y la segunda \(n\) opciones, el número total de pares ordenados es \(m \cdot n\).</p>
+                    <p><strong>Notación Factorial:</strong> Para un entero \(n \ge 0\), \(n! = n \cdot (n-1) \cdot \dots \cdot 1\), con la definición axiomática \(0! = 1\).</p>
+                    <p><strong>Permutaciones:</strong> Arreglos ordenados de \(r\) objetos seleccionados de un total de \(n\). El orden importa.</p>
+                    <p><strong>Combinaciones:</strong> Selecciones de \(r\) objetos de un grupo de \(n\) donde el orden no importa.</p>
+                    <p><strong>Diagrama de Árbol:</strong> Representación gráfica secuencial de los posibles resultados de un experimento multietapa.</p>
+                    <p><strong>Teorema del Binomio:</strong> Expandir \((a+b)^n = \sum_{k=0}^{n} \binom{n}{k} a^{n-k} b^k\).</p>
+                    <div class="formula-box">
+                        $$P(n, r) = \frac{n!}{(n - r)!} \quad | \quad C(n, r) = \binom{n}{r} = \frac{n!}{r!(n - r)!}$$
+                    </div>
+
+                    <h3>2.2 Teoría Elemental de Probabilidad y Conceptos</h3>
+                    <p>La probabilidad cuantifica la posibilidad de ocurrencia de un evento en un experimento aleatorio en una escala de 0 a 1.</p>
+
+                    <h3>2.3 Probabilidad de Eventos</h3>
+                    <p><strong>Espacio Muestral (\(S\)):</strong> Conjunto de todos los resultados posibles de un experimento aleatorio.</p>
+                    <p><strong>Evento:</strong> Subconjunto del espacio muestral \(S\).</p>
+                    <p><strong>Operaciones de Eventos:</strong> Unión (\(A \cup B\)), Intersección (\(A \cap B\)), Complemento (\(A^c\)). Diagramas de Venn permiten la representación analítica.</p>
+
+                    <h3>2.4 Probabilidad con Técnicas de Conteo, Axiomas y Teoremas</h3>
+                    <div class="formula-box">
+                        $$\text{Axioma 1: } 0 \le P(A) \le 1 \quad \forall A$$
+                        $$\text{Axioma 2: } P(S) = 1$$
+                        $$\text{Axioma 3: Si } A_1, A_2, \dots \text{ son excluyentes: } P\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} P(A_i)$$
+                        $$\text{Regla Aditiva General: } P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
+                    </div>
+
+                    <h3>2.5 Probabilidad Condicional</h3>
+                    <p>La probabilidad de que ocurra el evento \(A\) dado que el evento \(B\) ya ha ocurrido está dada por:</p>
+                    <div class="formula-box">
+                        $$P(A|B) = \frac{P(A \cap B)}{P(B)}, \quad \text{con } P(B) > 0$$
+                    </div>
+
+                    <h3>2.6 Ley Multiplicativa</h3>
+                    <div class="formula-box">
+                        $$P(A \cap B) = P(B) \cdot P(A|B) = P(A) \cdot P(B|A)$$
+                    </div>
+
+                    <h3>2.7 Eventos Independientes y Regla de Bayes</h3>
+                    <p>Dos eventos son <strong>Independientes</strong> si \(P(A|B) = P(A)\), lo cual implica que \(P(A \cap B) = P(A) \cdot P(B)\).</p>
+                    <p><strong>Teorema de Bayes:</strong> Permite calcular probabilidades a posteriori para una partición \(B_1, B_2, \dots, B_k\) del espacio muestral:</p>
+                    <div class="formula-box">
+                        $$P(B_r|A) = \frac{P(A|B_r) P(B_r)}{\sum_{i=1}^{k} P(A|B_i) P(B_i)}$$
+                    </div>
+                </div>
+
+                <div class="card" id="u2-ejemplos">
+                    <h2>📐 Problemas Resueltos Paso a Paso - Unidad 2</h2>
+
+                    <div class="example-box">
+                        <h4>Problema 1: Combinaciones y Probabilidad Clásica</h4>
+                        <p><strong>Enunciado:</strong> De un lote de 12 componentes que contiene 4 defectuosos y 8 buenos, se extrae una muestra aleatoria de 3 componentes sin reemplazo. Calcula la probabilidad de obtener exactamente 2 defectuosos.</p>
+                        <p><strong>Paso 1: Número total de formas de seleccionar 3 componentes de 12 (\(|S|\)).</strong></p>
+                        <p>$$|S| = \binom{12}{3} = \frac{12!}{3! \cdot 9!} = \frac{12 \times 11 \times 10}{3 \times 2 \times 1} = 220$$</p>
+                        <p><strong>Paso 2: Número de formas favorables de elegir 2 defectuosos (de 4) y 1 bueno (de 8).</strong></p>
+                        <p>$$\text{Casos Favorables} = \binom{4}{2} \times \binom{8}{1} = \frac{4 \times 3}{2} \times 8 = 6 \times 8 = 48$$</p>
+                        <p><strong>Paso 3: Cálculo de la Probabilidad.</strong></p>
+                        <p>$$P(\text{2 defectuosos}) = \frac{48}{220} = \frac{12}{55} \approx 0.2182 \quad (21.82\%)$$</p>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>Problema 2: Probabilidad Condicional</h4>
+                        <p><strong>Enunciado:</strong> En una facultad, el 25% de los alumnos reprobó Matemáticas (\(M\)), el 15% reprobó Química (\(Q\)) y el 10% reprobó ambas materias. Se selecciona un alumno al azar. Si reprobó Química, ¿cuál es la probabilidad de que también haya reprobado Matemáticas?</p>
+                        <p><strong>Paso 1: Definir las probabilidades conocidas.</strong></p>
+                        <p>\(P(M) = 0.25\), \(P(Q) = 0.15\), \(P(M \cap Q) = 0.10\).</p>
+                        <p><strong>Paso 2: Aplicar la fórmula de Probabilidad Condicional \(P(M|Q)\).</strong></p>
+                        <p>$$P(M|Q) = \frac{P(M \cap Q)}{P(Q)}$$</p>
+                        <p><strong>Paso 3: Sustitución analítica.</strong></p>
+                        <p>$$P(M|Q) = \frac{0.10}{0.15} = \frac{2}{3} \approx 0.6667 \quad (66.67\%)$$</p>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>Problema 3: Aplicación del Teorema de Bayes</h4>
+                        <p><strong>Enunciado:</strong> Una fábrica utiliza tres máquinas (\(M_1, M_2, M_3\)) para ensamblar piezas. \(M_1\) produce el 50% del total, \(M_2\) el 30% y \(M_3\) el 20%. Las tasas de defecto son 1%, 2% y 3% respectivamente. Si se inspecciona una pieza al azar y resulta defectuosa (\(D\)), ¿cuál es la probabilidad de que proceda de la máquina \(M_3\)?</p>
+                        <p><strong>Paso 1: Probabilidades a priori y condicionales.</strong></p>
+                        <p>\(P(M_1) = 0.50, P(D|M_1) = 0.01\)</p>
+                        <p>\(P(M_2) = 0.30, P(D|M_2) = 0.02\)</p>
+                        <p>\(P(M_3) = 0.20, P(D|M_3) = 0.03\)</p>
+                        <p><strong>Paso 2: Teorema de la Probabilidad Total \(P(D)\).</strong></p>
+                        <p>$$P(D) = P(M_1)P(D|M_1) + P(M_2)P(D|M_2) + P(M_3)P(D|M_3)$$</p>
+                        <p>$$P(D) = (0.50)(0.01) + (0.30)(0.02) + (0.20)(0.03) = 0.005 + 0.006 + 0.006 = 0.017$$</p>
+                        <p><strong>Paso 3: Teorema de Bayes para \(P(M_3|D)\).</strong></p>
+                        <p>$$P(M_3|D) = \frac{P(M_3)P(D|M_3)}{P(D)} = \frac{(0.20)(0.03)}{0.017} = \frac{0.006}{0.017} \approx 0.3529 \quad (35.29\%)$$</p>
+                    </div>
+                </div>
+
+                <div class="card" id="u2-examen">
+                    <h2>📝 Examen de Evaluación - Unidad 2</h2>
+                    <button class="btn btn-orange" onclick="toggleQuiz('u2-quiz-box')">🚀 Desplegar Examen Unidad 2 (20 Preguntas)</button>
+                    <div id="u2-quiz-box" class="quiz-toggle-box">
+                        <div id="u2-quiz-container"></div>
+                        <button class="btn btn-green" onclick="evaluateUnitQuiz('u2', 20)">Calcular Nota Unidad 2</button>
+                        <div id="u2-result" class="quiz-result-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNIDAD 3 -->
+            <div id="u3" class="parcial-content">
+                <div class="card" id="u3-teoria">
+                    <h2>Unidad 3: Variables Aleatorias</h2>
+                    
+                    <p>Una Variable Aleatoria es una función que asigna un número real a cada resultado del espacio muestral de un experimento aleatorio.</p>
+
+                    <h3>3.1 Variables Aleatorias Discretas</h3>
+                    <p>Toman un conjunto finito o infinito numerable de valores aislados.</p>
+                    <ul>
+                        <li><strong>Distribución de Probabilidad:</strong> Definida por la Función de Masa de Probabilidad (FMP) \(p(x) = P(X = x)\), con \(\sum p(x) = 1\) y \(p(x) \ge 0\).</li>
+                        <li><strong>Valor Esperado / Media:</strong> \(E(X) = \mu = \sum [x \cdot p(x)]\).</li>
+                        <li><strong>Varianza y Desviación Estándar:</strong> \(V(X) = \sigma^2 = E(X^2) - [E(X)]^2 = \sum [(x - \mu)^2 \cdot p(x)]\), y \(\sigma = \sqrt{\sigma^2}\).</li>
+                        <li><strong>Función Acumulada (FDA):</strong> \(F(x) = P(X \le x) = \sum_{k \le x} p(k)\).</li>
+                    </ul>
+
+                    <h3>3.2 Variables Aleatorias Continuas</h3>
+                    <p>Pueden tomar cualquier valor dentro de un intervalo continuo de los números reales.</p>
+                    <ul>
+                        <li><strong>Función de Densidad de Probabilidad (FDP):</strong> Una función \(f(x) \ge 0\) tal que \(\int_{-\infty}^{\infty} f(x) dx = 1\). Nota: \(P(X = a) = 0\) para todo punto individual.</li>
+                        <li><strong>Valor Esperado:</strong> \(E(X) = \mu = \int_{-\infty}^{\infty} x \cdot f(x) dx\).</li>
+                        <li><strong>Varianza:</strong> \(V(X) = \sigma^2 = \int_{-\infty}^{\infty} (x - \mu)^2 f(x) dx = E(X^2) - [E(X)]^2\).</li>
+                        <li><strong>Función Acumulada (FDA):</strong> \(F(x) = P(X \le x) = \int_{-\infty}^{x} f(t) dt\).</li>
+                        <li><strong>Cálculo de Probabilidades en Intervalos:</strong> \(P(a \le X \le b) = \int_{a}^{b} f(x) dx = F(b) - F(a)\).</li>
+                    </ul>
+                </div>
+
+                <div class="card" id="u3-ejemplos">
+                    <h2>📐 Problemas Resueltos Paso a Paso - Unidad 3</h2>
+
+                    <div class="example-box">
+                        <h4>Problema 1: V.A. Discreta - Esperanza y Varianza</h4>
+                        <p><strong>Enunciado:</strong> Una variable aleatoria discreta \(X\) representa el número de fallas diarias en un servidor con la siguiente FMP:</p>
+                        <p>\(p(0) = 0.5\), \(p(1) = 0.3\), \(p(2) = 0.15\), \(p(3) = 0.05\). Calcula la esperanza \(E(X)\) y la varianza \(V(X)\).</p>
+                        <p><strong>Paso 1: Verificación de la FMP.</strong></p>
+                        <p>$$\sum p(x) = 0.5 + 0.3 + 0.15 + 0.05 = 1.0 \quad (\text{Válido})$$</p>
+                        <p><strong>Paso 2: Valor Esperado \(E(X)\).</strong></p>
+                        <p>$$E(X) = (0 \times 0.5) + (1 \times 0.3) + (2 \times 0.15) + (3 \times 0.05) = 0 + 0.3 + 0.3 + 0.15 = 0.75 \text{ fallas}$$</p>
+                        <p><strong>Paso 3: Cálculo del Segundo Momento \(E(X^2)\).</strong></p>
+                        <p>$$E(X^2) = (0^2 \times 0.5) + (1^2 \times 0.3) + (2^2 \times 0.15) + (3^2 \times 0.05) = 0 + 0.3 + 0.6 + 0.45 = 1.35$$</p>
+                        <p><strong>Paso 4: Varianza \(V(X)\).</strong></p>
+                        <p>$$V(X) = E(X^2) - [E(X)]^2 = 1.35 - (0.75)^2 = 1.35 - 0.5625 = 0.7875$$</p>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>Problema 2: V.A. Continua - Obtención de la Constante y Probabilidad</h4>
+                        <p><strong>Enunciado:</strong> Sea la función de densidad \(f(x) = k \cdot x^2\) para \(0 \le x \le 2\) y \(0\) en cualquier otro caso. Determina la constante \(k\) y calcula \(P(1 \le X \le 2)\).</p>
+                        <p><strong>Paso 1: Integración de normalización.</strong></p>
+                        <p>$$\int_{0}^{2} k x^2 dx = 1 \implies k \left[ \frac{x^3}{3} \right]_0^2 = 1 \implies k \left( \frac{8}{3} - 0 \right) = 1 \implies k = \frac{3}{8}$$</p>
+                        <p><strong>Paso 2: Cálculo de Probabilidad en Intervalo.</strong></p>
+                        <p>$$P(1 \le X \le 2) = \int_{1}^{2} \frac{3}{8} x^2 dx = \frac{3}{8} \left[ \frac{x^3}{3} \right]_1^2 = \frac{1}{8} [8 - 1] = \frac{7}{8} = 0.875 \quad (87.5\%)$$</p>
+                    </div>
+
+                    <div class="example-box">
+                        <h4>Problema 3: V.A. Continua - Valor Esperado \(E(X)\)</h4>
+                        <p><strong>Enunciado:</strong> Utilizando la FDP del problema anterior \(f(x) = \frac{3}{8} x^2\) para \(0 \le x \le 2\), calcula la esperanza de la variable.</p>
+                        <p><strong>Paso 1: Planteamiento de la integral del Valor Esperado.</strong></p>
+                        <p>$$E(X) = \int_{-\infty}^{\infty} x \cdot f(x) dx = \int_{0}^{2} x \cdot \left( \frac{3}{8} x^2 \right) dx = \frac{3}{8} \int_{0}^{2} x^3 dx$$</p>
+                        <p><strong>Paso 2: Evaluación analítica.</strong></p>
+                        <p>$$E(X) = \frac{3}{8} \left[ \frac{x^4}{4} \right]_0^2 = \frac{3}{8} \cdot \left( \frac{16}{4} - 0 \right) = \frac{3}{8} \cdot 4 = \frac{12}{8} = 1.5$$</p>
+                    </div>
+                </div>
+
+                <div class="card" id="u3-examen">
+                    <h2>📝 Examen de Evaluación - Unidad 3</h2>
+                    <button class="btn btn-orange" onclick="toggleQuiz('u3-quiz-box')">🚀 Desplegar Examen Unidad 3 (20 Preguntas)</button>
+                    <div id="u3-quiz-box" class="quiz-toggle-box">
+                        <div id="u3-quiz-container"></div>
+                        <button class="btn btn-green" onclick="evaluateUnitQuiz('u3', 20)">Calcular Nota Unidad 3</button>
+                        <div id="u3-result" class="quiz-result-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LABORATORIO -->
+            <div id="lab" class="parcial-content">
+                <div class="card">
+                    <h2>🧪 Laboratorio Interactivo</h2>
+                    <p>Simulador numérico del Teorema del Límite Central e Inferencia Estocástica.</p>
+                    <div class="sim-container">
+                        <canvas id="canvasTLC" width="460" height="150"></canvas>
+                        <button class="btn" onclick="simTLCSamples(100)">Generar 100 Muestras</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXAMEN FINAL GENERAL -->
+            <div id="examen" class="parcial-content">
+                <div class="card">
+                    <h2>🎓 Examen Evaluación Final General</h2>
+                    <p>Evaluación integradora global de la asignatura.</p>
+                </div>
+                <div class="card">
+                    <div id="examen-questions"></div>
+                    <button type="button" class="btn btn-orange" onclick="evaluateExamenGlobal()">Calcular Nota Examen Final General</button>
+                    <div id="resultExamen" class="quiz-result-box"></div>
+                </div>
+            </div>
+
+            <!-- REPORTE -->
+            <div id="reporte" class="parcial-content">
+                <div class="card">
+                    <h2>📊 Reporte Consolidado Académico</h2>
+                    <button class="btn btn-green" onclick="generatePDF()">📄 Descargar PDF</button>
+                </div>
+                <div id="reportPrintArea" class="report-card">
+                    <h2>StatAcademy - Reporte Académico</h2>
+                    <p>Alumno: <span id="repNombre">--</span> | Matrícula: <span id="repMatricula">--</span> | Grupo: <span id="repGrupo">--</span></p>
+                    <table>
+                        <thead>
+                            <tr><th>Evaluación</th><th>Aciertos</th><th>Nota / 10</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Diagnóstico Inicial</td><td id="repDiagScore">0 / 10</td><td id="repDiagGrade">0.0</td></tr>
+                            <tr><td>Unidad 1: Descriptiva</td><td id="repU1Score">0 / 20</td><td id="repU1Grade">0.0</td></tr>
+                            <tr><td>Unidad 2: Probabilidad</td><td id="repU2Score">0 / 20</td><td id="repU2Grade">0.0</td></tr>
+                            <tr><td>Unidad 3: Var. Aleatorias</td><td id="repU3Score">0 / 20</td><td id="repU3Grade">0.0</td></tr>
+                            <tr><td>Unidad 4: Distribuciones</td><td id="repU4Score">0 / 20</td><td id="repU4Grade">0.0</td></tr>
+                            <tr><td>Unidad 5: Regresión</td><td id="repU5Score">0 / 20</td><td id="repU5Grade">0.0</td></tr>
+                            <tr><td>Unidad 6: Est. Aplicada</td><td id="repU6Score">0 / 20</td><td id="repU6Grade">0.0</td></tr>
+                            <tr><td>Examen Final General</td><td id="repScore">0 / 10</td><td id="repGrade">0.0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const userData = {
+            matricula: '', nombre: '', grupo: '',
+            diagScore: 0, examScore: 0,
+            unitScores: { u1: 0, u2: 0, u3: 0, u4: 0, u5: 0, u6: 0 }
+        };
+
+        function saveUserData() {
+            userData.matricula = document.getElementById('inputMatricula').value.trim();
+            userData.nombre = document.getElementById('inputNombre').value.trim();
+            userData.grupo = document.getElementById('inputGrupo').value.trim();
+            if(!userData.nombre) return alert("Ingresa tu nombre");
+            document.getElementById('userDisplay').textContent = `Alumno: ${userData.nombre} (${userData.grupo})`;
+            document.getElementById('userModal').style.display = 'none';
+            updateReportTable();
+        }
+
+        function toggleQuiz(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        }
+
+        const sidebarContents = {
+            diag: { title: "Diagnóstico", items: [{ name: "🩺 Evaluación Inicial", link: "#diag" }] },
+            u1: { title: "Unidad 1", items: [{ name: "📖 Teoría U1", link: "#u1-teoria" }, { name: "📐 Problemas Resueltos", link: "#u1-ejemplos" }, { name: "📝 Examen U1", link: "#u1-examen" }] },
+            u2: { title: "Unidad 2", items: [{ name: "📖 Teoría U2", link: "#u2-teoria" }, { name: "📐 Problemas Resueltos", link: "#u2-ejemplos" }, { name: "📝 Examen U2", link: "#u2-examen" }] },
+            u3: { title: "Unidad 3", items: [{ name: "📖 Teoría U3", link: "#u3-teoria" }, { name: "📐 Problemas Resueltos", link: "#u3-ejemplos" }, { name: "📝 Examen U3", link: "#u3-examen" }] },
+            lab: { title: "Laboratorio", items: [{ name: "🧪 Experimento TLC", link: "#lab" }] },
+            examen: { title: "Examen Final", items: [{ name: "🎓 Evaluación Final", link: "#examen" }] },
+            reporte: { title: "Reporte", items: [{ name: "📊 Descargar PDF", link: "#reporte" }] }
+        };
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.parcial-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+
+            const data = sidebarContents[id];
+            if (data) {
+                document.getElementById('sidebar-title').textContent = data.title;
+                const list = document.getElementById('sidebar-list');
+                list.innerHTML = '';
+                data.items.forEach(it => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${it.link}">${it.name}</a>`;
+                    list.appendChild(li);
+                });
+            }
+        }
+
+        const unitQuizzes = {
+            u1: [
+                { q: "1. ¿Qué estudia la Estadística Descriptiva?", options: ["Estimación de parámetros poblacionales", "Organización, resumen y presentación de datos", "Pruebas de hipótesis complejas", "Predicción bayesiana avanzada"], answer: 1 },
+                { q: "2. Un parámetro es una medida numérica calculada sobre:", options: ["Una muestra", "Toda la población", "Un experimento de laboratorio", "Un subgrupo por conveniencia"], answer: 1 },
+                { q: "3. La mediana es una medida de tendencia central que representa:", options: ["El valor promedio ponderado", "El dato de mayor frecuencia", "El valor central al ordenar los datos al 50%", "La diferencia entre máximo y mínimo"], answer: 2 },
+                { q: "4. ¿Qué es la frecuencia absoluta?", options: ["El porcentaje de datos en una clase", "El número de veces que se repite un dato", "La suma acumulada de proporciones", "La diferencia de límites reales"], answer: 1 },
+                { q: "5. La regla de Sturges k = 1 + 3.322*log10(n) sirve para:", options: ["Calcular la desviación estándar", "Determinar el número recomendado de clases", "Hallar la mediana", "Estimar la varianza"], answer: 1 },
+                { q: "6. La marca de clase Xi es:", options: ["El límite inferior", "El límite superior", "El punto medio del intervalo de clase", "El ancho de clase"], answer: 2 },
+                { q: "7. ¿Cómo se calcula la varianza muestral s²?", options: ["Suma de desviaciones cuadráticas entre (n-1)", "Promedio directo de datos", "Raíz del rango", "Suma de frecuencias entre n"], answer: 0 },
+                { q: "8. El gráfico formado por rectángulos contiguos cuya altura es la frecuencia se llama:", options: ["Polígono de frecuencias", "Histograma", "Ojiva", "Diagrama de dispersión"], answer: 1 },
+                { q: "9. La ojiva es una representación gráfica de:", options: ["Frecuencias absolutas", "Frecuencias acumuladas", "Marcas de clase solas", "Residuales"], answer: 1 },
+                { q: "10. El percentil 50 P50 equivale a:", options: ["La Media", "La Mediana y el Cuartil 2 (Q2)", "La Moda", "El rango intercuartílico"], answer: 1 },
+                { q: "11. Si un conjunto de datos tiene dos modas, la distribución es:", options: ["Unimodal", "Bimodal", "Amodal", "Uniforme"], answer: 1 },
+                { q: "12. La desviación estándar muestral s es:", options: ["La raíz cuadrada positiva de la varianza s²", "El cuadrado de la varianza", "El promedio absoluto", "La resta de cuartiles"], answer: 0 },
+                { q: "13. El muestreo estratificado consiste en:", options: ["Seleccionar elementos a intervalos fijos k", "Dividir la población en subgrupos homogéneos y muestrear cada uno", "Elegir por conveniencia del investigador", "Tomar toda la población"], answer: 1 },
+                { q: "14. El muestreo sistemático se caracteriza por:", options: ["Elegir elementos cada k-ésima posición", "Dividir en estratos", "Seleccionar por bola de nieve", "Usar t-student"], answer: 0 },
+                { q: "15. ¿Qué mide el rango en estadística?", options: ["Dispersión total entre el valor máximo y mínimo", "Tendencia central de los datos", "Frecuencia acumulada", "La simetría exacta"], answer: 0 },
+                { q: "16. El coeficiente de variación CV = (s / x_barra) * 100 mide:", options: ["Dispersión relativa respecto a la media", "Error cuadrático medio", "Asimetría absoluta", "La moda del sistema"], answer: 0 },
+                { q: "17. En una distribución con sesgo a la derecha (positivo):", options: ["Media > Mediana", "Media < Mediana", "Media = Mediana", "Mediana = Moda"], answer: 0 },
+                { q: "18. El rango intercuartílico RIC es:", options: ["Q3 - Q1", "Q3 + Q1", "Q2 - Q1", "P90 - P10"], answer: 0 },
+                { q: "19. Los límites reales de clase eliminan:", options: ["La frecuencia relativa", "Los huecos continuos entre intervalos", "La marca de clase", "La varianza"], answer: 1 },
+                { q: "20. El muestreo no probabilístico por cuotas se basa en:", options: ["Azar puro", "Criterios prefijados sin selección aleatoria estricta", "Tablas de números aleatorios", "Sistemas de conmutación"], answer: 1 }
+            ],
+            u2: [
+                { q: "1. Una permutación P(n,r) se diferencia de una combinación C(n,r) en que:", options: ["En la permutación EL ORDEN SÍ importa", "En la permutación el orden NO importa", "Usan fórmulas idénticas", "Ambas requieren reemplazo continuo"], answer: 0 },
+                { q: "2. ¿Cuántas formas hay de ordenar 4 libros en un estante (4!)?", options: ["12", "24", "16", "8"], answer: 1 },
+                { q: "3. La fórmula de combinaciones C(n, r) es:", options: ["n! / (n-r)!", "n! / [r!(n-r)!]", "n^r", "(n-1)!"], answer: 1 },
+                { q: "4. El espacio muestral S de lanzar una moneda dos veces tiene cuántos elementos:", options: ["2", "4", "6", "8"], answer: 1 },
+                { q: "5. Dos eventos son mutuamente excluyentes si:", options: ["Pueden ocurrir al mismo tiempo", "Su intersección es vacía P(A∩B) = 0", "Son independientes", "Su suma da cero"], answer: 1 },
+                { q: "6. El axioma 2 de Kolmogorov establece que la probabilidad del espacio muestral S es:", options: ["0", "1", "Infinita", "0.5"], answer: 1 },
+                { q: "7. La probabilidad del complemento de un evento A se calcula:", options: ["1 - P(A)", "P(A) / 2", "1 / P(A)", "P(A) + 1"], answer: 0 },
+                { q: "8. La fórmula de Probabilidad Condicional P(A|B) es:", options: ["P(A∩B) / P(B)", "P(A∪B) / P(B)", "P(A) * P(B)", "P(B) / P(A)"], answer: 0 },
+                { q: "9. Dos eventos A y B son independientes si y solo si:", options: ["P(A∩B) = P(A) * P(B)", "P(A∩B) = 0", "P(A|B) = 0", "P(A) + P(B) = 1"], answer: 0 },
+                { q: "10. La Regla del Producto para eventos independientes indica que P(A∩B) es:", options: ["P(A) + P(B)", "P(A) * P(B)", "P(A) / P(B)", "P(A) - P(B)"], answer: 1 },
+                { q: "11. El Teorema de la Probabilidad Total se usa cuando el espacio muestral está dividido en:", options: ["Eventos continuos", "Una partición de eventos mutuamente excluyentes y exhaustivos", "Muestras pequeñas", "Intervalos de clase"], answer: 1 },
+                { q: "12. El Teorema de Bayes calcula la probabilidad de:", options: ["Una causa dado un efecto observado (A posteriori)", "Un evento futuro sin datos", "La media muestral", "La varianza conjunta"], answer: 0 },
+                { q: "13. En un diagrama de árbol, la suma de las probabilidades de las ramas que salen de un nodo es:", options: ["0.5", "1", "Varía según n", "Igual al número de ramas"], answer: 1 },
+                { q: "14. La aproximación clásica de probabilidad P(A) es válida si los resultados son:", options: ["Diferentes", "Equiprobables", "Continuos", "Infinitos"], answer: 1 },
+                { q: "15. La ley de los grandes números afirma que la frecuencia relativa de un evento converge a su probabilidad cuando:", options: ["El número de ensayos tiende a infinito", "El número de ensayos es 30", "Se calcula la varianza", "La muestra es no aleatoria"], answer: 0 },
+                { q: "16. La unión de dos eventos A y B comprende:", options: ["Solo elementos comunes", "Elementos que están en A, en B o en ambos", "Elementos fuera de A y B", "El producto de ambos"], answer: 1 },
+                { q: "17. Si P(A) = 0.4 y P(B) = 0.3 con A y B independientes, P(A∩B) es:", options: ["0.7", "0.12", "0.10", "0.50"], answer: 1 },
+                { q: "18. Si P(A) = 0.5, P(B) = 0.4 y P(A∩B) = 0.2, la unión P(A∪B) es:", options: ["0.7", "0.9", "0.2", "0.8"], answer: 0 },
+                { q: "19. El principio multiplicativo del conteo establece que si una tarea se hace de m formas y otra de n:", options: ["Ocurren juntas de m * n formas", "Ocurren de m + n formas", "Ocurren de m^n formas", "Ocurren de m! formas"], answer: 0 },
+                { q: "20. Una combinación se usa para calcular:", options: ["Listas ordenadas de premios", "Comités o subgrupos donde la posición no otorga distinción", "Series de tiempo", "Secuencias exactas"], answer: 1 }
+            ],
+            u3: [
+                { q: "1. Una Variable Aleatoria Discreta se caracteriza por:", options: ["Tomar un número finito o infinito contable de valores", "Tomar cualquier valor dentro de un intervalo real continuo", "Tener densidad constante", "Tener varianza cero"], answer: 0 },
+                { q: "2. Una Variable Aleatoria Continua se caracteriza por:", options: ["Valores contables aislados", "Poder tomar un número infinito no contable de valores en un intervalo", "Tener masa puntual de probabilidad", "No ser integrable"], answer: 1 },
+                { q: "3. La Función de Masa de Probabilidad (FMP) p(x) cumple que:", options: ["Suma de p(x) = 1 y 0 <= p(x) <= 1", "Suma de p(x) = 0", "p(x) > 1 siempre", "Integral de p(x) = 0"], answer: 0 },
+                { q: "4. En una variable aleatoria continua, la probabilidad puntual P(X = c) es:", options: ["f(c)", "0", "1", "0.5"], answer: 1 },
+                { q: "5. El Valor Esperado E(X) de una variable discreta se calcula como:", options: ["Suma de [x * p(x)]", "Suma de x / n", "Integral de x^2 dx", "Suma de p(x) / x"], answer: 0 },
+                { q: "6. La fórmula de la Varianza V(X) usando momentos es:", options: ["E(X²) - [E(X)]²", "E(X) - E(X²)", "[E(X)]²", "E(X²) + E(X)"], answer: 0 },
+                { q: "7. La Función de Distribución Acumulada FDA F(x) representa:", options: ["P(X = x)", "P(X <= x)", "P(X > x)", "f'(x)"], answer: 1 },
+                { q: "8. Para toda FDP f(x) continua, la integral de -infinito a +infinito de f(x)dx debe ser:", options: ["0", "1", "Infinita", "0.5"], answer: 1 },
+                { q: "9. Si c es una constante, el valor esperado E(c) es:", options: ["0", "c", "c * E(X)", "1"], answer: 1 },
+                { q: "10. Si c es una constante y X es aleatoria, la varianza V(c*X) es:", options: ["c * V(X)", "c² * V(X)", "V(X)", "0"], answer: 1 },
+                { q: "11. La desviación estándar de una variable aleatoria es:", options: ["El cuadrado de la varianza", "La raíz cuadrada positiva de V(X)", "El valor esperado E(X)", "La derivada de F(x)"], answer: 1 },
+                { q: "12. La relación entre la FDP f(x) y la FDA F(x) continua es:", options: ["f(x) es la derivada de F(x)", "F(x) es la derivada de f(x)", "f(x) = F(x)", "f(x) * F(x) = 1"], answer: 0 },
+                { q: "13. La probabilidad P(a <= X <= b) en una variable continua equivale a:", options: ["f(b) - f(a)", "Integral de a a b de f(x)dx", "F(a) - F(b)", "f(a) * f(b)"], answer: 1 },
+                { q: "14. El primer momento alrededor del origen E(X) es:", options: ["La Varianza", "La Media o Valor Esperado", "La Desviación Estándar", "La Moda"], answer: 1 },
+                { q: "15. El segundo momento central E[(X - mu)²] representa:", options: ["La Media", "La Varianza", "El Sesgo", "La Curtosis"], answer: 1 },
+                { q: "16. Si X e Y son independientes, E(X + Y) es:", options: ["E(X) + E(Y)", "E(X) * E(Y)", "E(X) / E(Y)", "E(X²) + E(Y²)"], answer: 0 },
+                { q: "17. Si X e Y son independientes, V(X + Y) es:", options: ["V(X) + V(Y)", "V(X) - V(Y)", "V(X) * V(Y)", "V(X) / V(Y)"], answer: 0 },
+                { q: "18. Para una variable discreta, F(x) es una función:", options: ["Escalonada continua por la izquierda", "Escalonada no decreciente", "Lineal recta", "Curva suave de campana"], answer: 1 },
+                { q: "19. La probabilidad P(X > a) se puede calcular como:", options: ["1 - F(a)", "F(a)", "f(a)", "1 / F(a)"], answer: 0 },
+                { q: "20. La varianza de una constante V(c) es siempre igual a:", options: ["c", "1", "0", "Infinita"], answer: 2 }
+            ]
+        };
+
+        const diagQuizData = [
+            { q: "1. ¿Qué rama de la estadística presenta y resume datos numéricamente?", options: ["Descriptiva", "Inferencial", "Bayesiana", "Probabilística"], answer: 0 },
+            { q: "2. Si se lanzan dos dados, ¿cuántos resultados posibles hay?", options: ["12", "36", "24", "18"], answer: 1 },
+            { q: "3. La probabilidad de un evento seguro es:", options: ["0", "1", "0.5", "100"], answer: 1 },
+            { q: "4. La media poblacional se denota por:", options: ["sigma", "mu", "beta", "x_barra"], answer: 1 },
+            { q: "5. ¿Qué distribución discreta evalúa n ensayos independientes?", options: ["Binomial", "Poisson", "Normal", "T-Student"], answer: 0 },
+            { q: "6. Coeficiente r = 0 en Pearson indica:", options: ["Sin relación lineal", "Relación perfecta", "Relación negativa", "Error"], answer: 0 },
+            { q: "7. El Teorema del Límite Central aplica cuando n es:", options: ["Grande (n>=30)", "Pequeño", "Igual a 1", "Cero"], answer: 0 },
+            { q: "8. El Error Tipo I es:", options: ["Rechazar H0 siendo verdadera", "Aceptar H0 siendo falsa", "Error numérico", "Muestra mala"], answer: 0 },
+            { q: "9. La medida del valor más frecuente es:", options: ["Moda", "Media", "Mediana", "Percentil"], answer: 0 },
+            { q: "10. La integral total de una FDP continua vale:", options: ["1", "0", "0.5", "Infinita"], answer: 0 }
+        ];
+
+        function renderDiagQuiz() {
+            const container = document.getElementById('diag-quiz-container');
+            container.innerHTML = '';
+            diagQuizData.forEach((qData, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'quiz-question';
+                let opts = '';
+                qData.options.forEach((opt, oIdx) => {
+                    opts += `<label class="quiz-option"><input type="radio" name="diag-q${qIdx}" value="${oIdx}"> ${opt}</label>`;
+                });
+                qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${opts}</div>`;
+                container.appendChild(qDiv);
+            });
+        }
+
+        function renderUnitQuizzes() {
+            Object.keys(unitQuizzes).forEach(uKey => {
+                const container = document.getElementById(`${uKey}-quiz-container`);
+                if (!container) return;
+                container.innerHTML = '';
+                unitQuizzes[uKey].forEach((qData, qIdx) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let opts = '';
+                    qData.options.forEach((opt, oIdx) => {
+                        opts += `<label class="quiz-option"><input type="radio" name="${uKey}-q${qIdx}" value="${oIdx}"> ${opt}</label>`;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${opts}</div>`;
+                    container.appendChild(qDiv);
+                });
+            });
+        }
+
+        function evaluateDiagQuiz() {
+            let score = 0;
+            diagQuizData.forEach((qData, qIdx) => {
+                const sel = document.querySelector(`input[name="diag-q${qIdx}"]:checked`);
+                if (sel && parseInt(sel.value) === qData.answer) score++;
+            });
+            userData.diagScore = score;
+            const res = document.getElementById('diag-result');
+            res.style.display = 'block';
+            res.innerHTML = `<h3>Resultado Diagnóstico: ${score} / 10 aciertos (Nota: ${score.toFixed(1)}/10)</h3>`;
+            updateReportTable();
+        }
+
+        function evaluateUnitQuiz(uKey, totalQ) {
+            let score = 0;
+            unitQuizzes[uKey].forEach((qData, qIdx) => {
+                const sel = document.querySelector(`input[name="${uKey}-q${qIdx}"]:checked`);
+                if (sel && parseInt(sel.value) === qData.answer) score++;
+            });
+            userData.unitScores[uKey] = score;
+            const res = document.getElementById(`${uKey}-result`);
+            res.style.display = 'block';
+            res.innerHTML = `<h3>Resultado Examen ${uKey.toUpperCase()}: ${score} / ${totalQ} aciertos (Nota: ${((score/totalQ)*10).toFixed(1)}/10)</h3>`;
+            updateReportTable();
+        }
+
+        function updateReportTable() {
+            document.getElementById('repNombre').textContent = userData.nombre || '--';
+            document.getElementById('repMatricula').textContent = userData.matricula || '--';
+            document.getElementById('repGrupo').textContent = userData.grupo || '--';
+
+            document.getElementById('repDiagScore').textContent = `${userData.diagScore} / 10`;
+            document.getElementById('repDiagGrade').textContent = userData.diagScore.toFixed(1);
+
+            ['u1','u2','u3','u4','u5','u6'].forEach(uKey => {
+                const sc = userData.unitScores[uKey];
+                const scElem = document.getElementById(`rep${uKey.toUpperCase()}Score`);
+                const grElem = document.getElementById(`rep${uKey.toUpperCase()}Grade`);
+                if(scElem) scElem.textContent = `${sc} / 20`;
+                if(grElem) grElem.textContent = ((sc/20)*10).toFixed(1);
+            });
+
+            document.getElementById('repScore').textContent = `${userData.examScore} / 10`;
+            document.getElementById('repGrade').textContent = userData.examScore.toFixed(1);
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('reportPrintArea');
+            html2pdf().set({
+                margin: 0.5,
+                filename: `Reporte_Estadistica_${userData.matricula || 'Alumno'}.pdf`,
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            }).from(element).save();
+        }
+
+        let tlcMeans = [];
+        function simTLCSamples(count) {
+            for (let c = 0; c < count; c++) {
+                let sum = 0;
+                for (let i = 0; i < 10; i++) sum += Math.random();
+                tlcMeans.push(sum / 10);
+            }
+            drawTLCSim();
+        }
+
+        function drawTLCSim() {
+            const canvas = document.getElementById('canvasTLC');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (tlcMeans.length === 0) return;
+
+            const bins = new Array(20).fill(0);
+            tlcMeans.forEach(m => {
+                const idx = Math.min(19, Math.floor(m * 20));
+                bins[idx]++;
+            });
+
+            const maxBin = Math.max(...bins, 1);
+            const barWidth = canvas.width / 20;
+
+            ctx.fillStyle = '#38bdf8';
+            bins.forEach((cnt, i) => {
+                const h = (cnt / maxBin) * (canvas.height - 20);
+                ctx.fillRect(i * barWidth, canvas.height - h, barWidth - 2, h);
+            });
+        }
+
+        window.onload = function() {
+            switchTab('diag', document.querySelectorAll('.tab-btn')[0]);
+            renderDiagQuiz();
+            renderUnitQuizzes();
+            drawTLCSim();
+        };
+    </script>
+</body>
+</html>

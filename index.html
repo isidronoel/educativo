@@ -1,0 +1,1032 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Portal Educativo | Mecanismos, Dibujo, Estadística y Frameworks</title>
+
+    <meta name="description"
+          content="Portal educativo para el aprendizaje de Mecanismos, Dibujo Mecánico, Probabilidad y Estadística y Frameworks.">
+
+    <style>
+
+        /* =====================================================
+           CONFIGURACIÓN GENERAL
+           ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =====================================================
+           ENCABEZADO
+           ===================================================== */
+
+        header {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: auto;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: white;
+            color: #1e3a8a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        nav a {
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* =====================================================
+           HERO
+           ===================================================== */
+
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 75px 20px 90px;
+            text-align: center;
+        }
+
+        .hero-container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 20px;
+            line-height: 1.15;
+        }
+
+        .hero p {
+            max-width: 750px;
+            margin: auto;
+            font-size: 1.15rem;
+            opacity: 0.95;
+        }
+
+        .hero-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline {
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #1e3a8a;
+        }
+
+        /* =====================================================
+           BUSCADOR
+           ===================================================== */
+
+        .search-area {
+            max-width: 800px;
+            margin: -35px auto 0;
+            position: relative;
+            z-index: 10;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            padding: 0 15px;
+            font-size: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            padding: 14px 5px;
+            color: #333;
+        }
+
+        /* =====================================================
+           CONTENEDOR
+           ===================================================== */
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 70px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: #6b7280;
+        }
+
+        /* =====================================================
+           TARJETAS DE MATERIAS
+           ===================================================== */
+
+        .subjects {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.07);
+            transition: 0.3s;
+            border: 1px solid #e5e7eb;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.13);
+        }
+
+        .subject-header {
+            padding: 25px;
+            color: white;
+        }
+
+        .mechanisms {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        }
+
+        .drawing {
+            background: linear-gradient(135deg, #0891b2, #0369a1);
+        }
+
+        .statistics {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .frameworks {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+        }
+
+        .subject-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .subject-header h3 {
+            font-size: 1.45rem;
+            margin-bottom: 5px;
+        }
+
+        .subject-body {
+            padding: 25px;
+        }
+
+        .subject-body p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .topic {
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 20px;
+            padding: 6px 11px;
+            font-size: 0.82rem;
+        }
+
+        .enter-btn {
+            display: block;
+            text-align: center;
+            background: #111827;
+            color: white;
+            padding: 12px;
+            border-radius: 9px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .enter-btn:hover {
+            background: #2563eb;
+        }
+
+        /* =====================================================
+           ACCESOS RÁPIDOS
+           ===================================================== */
+
+        .quick-access {
+            background: white;
+            padding: 70px 20px;
+        }
+
+        .quick-grid {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .quick-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: 0.3s;
+            background: #fff;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .quick-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .quick-card h3 {
+            margin-bottom: 8px;
+        }
+
+        .quick-card p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        /* =====================================================
+           INFORMACIÓN
+           ===================================================== */
+
+        .info {
+            max-width: 900px;
+            margin: auto;
+            text-align: center;
+            padding: 70px 20px;
+        }
+
+        .info h2 {
+            margin-bottom: 15px;
+            color: #111827;
+        }
+
+        .info p {
+            color: #6b7280;
+        }
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        footer {
+            background: #0f172a;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .footer-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* =====================================================
+           MENSAJE DE BÚSQUEDA
+           ===================================================== */
+
+        #noResults {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .subjects {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .hero {
+                padding: 55px 20px 75px;
+            }
+
+            .hero h1 {
+                font-size: 2.1rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 50px 15px;
+            }
+
+            .subject-body {
+                padding: 20px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     ENCABEZADO
+     ========================================================= -->
+
+<header>
+
+    <div class="navbar">
+
+        <a href="index.html" class="logo">
+
+            <div class="logo-icon">
+                ??
+            </div>
+
+            <span>
+                PORTAL EDUCATIVO
+            </span>
+
+        </a>
+
+        <nav>
+
+            <a href="#inicio">Inicio</a>
+
+            <a href="#materias">Materias</a>
+
+            <a href="#recursos">Recursos</a>
+
+            <a href="#informacion">Información</a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     HERO
+     ========================================================= -->
+
+<section class="hero" id="inicio">
+
+    <div class="hero-container">
+
+        <h1>
+            Aprende, practica y desarrolla tus habilidades
+        </h1>
+
+        <p>
+            Portal educativo que concentra materiales,
+            ejercicios, prácticas y evaluaciones para las
+            materias de Mecanismos, Dibujo Mecánico,
+            Probabilidad y Estadística y Frameworks.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="#materias" class="btn btn-primary">
+                Explorar materias
+            </a>
+
+            <a href="#recursos" class="btn btn-outline">
+                Ver recursos
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     BUSCADOR
+     ========================================================= -->
+
+<div class="search-area">
+
+    <div class="search-box">
+
+        <div class="search-icon">
+            ??
+        </div>
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Buscar una materia o tema..."
+            onkeyup="buscarMateria()"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MATERIAS
+     ========================================================= -->
+
+<main>
+
+<section class="container" id="materias">
+
+    <div class="section-title">
+
+        <h2>
+            Mis materias
+        </h2>
+
+        <p>
+            Selecciona una materia para comenzar
+        </p>
+
+    </div>
+
+
+    <div class="subjects" id="subjectContainer">
+
+
+        <!-- =================================================
+             MECANISMOS
+             ================================================= -->
+
+        <article
+            class="subject-card"
+            data-search="mecanismos poleas polipastos transmisión movimiento"
+        >
+
+            <div class="subject-header mechanisms">
+
+                <div class="subject-icon">
+                    ??
+                </div>
+
+                <h3>
+                    Mecanismos
+                </h3>
+
+                <p>
+                    Sistemas de transmisión y movimiento
+                </p>
+
+            </div>
+
+            <div class="subject-body">
+
+                <p>
+                    Aprende los principios de funcionamiento
+                    de mecanismos, poleas, engranajes,
+                    transmisión de movimiento y aplicaciones
+                    prácticas.
+                </p>
+
+                <div class="topics">
+
+                    <span class="topic">Poleas</span>
+                    <span class="topic">Polipastos</span>
+                    <span class="topic">Engranajes</span>
+                    <span class="topic">Transmisión</span>
+
+                </div>
+
+                <!-- CAMBIA ESTE NOMBRE SI TU ARCHIVO TIENE OTRO NOMBRE -->
+
+                <a
+                    href="materias/mecanismos.html"
+                    class="enter-btn"
+                >
+                    ENTRAR A LA MATERIA ?
+                </a>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             DIBUJO MECÁNICO
+             ================================================= -->
+
+        <article
+            class="subject-card"
+            data-search="dibujo mecánico dibujo tecnico cad lineas planos"
+        >
+
+            <div class="subject-header drawing">
+
+                <div class="subject-icon">
+                    ??
+                </div>
+
+                <h3>
+                    Dibujo Mecánico
+                </h3>
+
+                <p>
+                    Representación gráfica y CAD
+                </p>
+
+            </div>
+
+            <div class="subject-body">
+
+                <p>
+                    Desarrolla conocimientos de dibujo técnico,
+                    dibujo mecánico, representación de piezas,
+                    líneas, formatos y herramientas CAD.
+                </p>
+
+                <div class="topics">
+
+                    <span class="topic">Dibujo técnico</span>
+                    <span class="topic">Planos</span>
+                    <span class="topic">CAD</span>
+                    <span class="topic">Piezas</span>
+
+                </div>
+
+                <!-- CAMBIA ESTE NOMBRE SI TU ARCHIVO TIENE OTRO NOMBRE -->
+
+                <a
+                    href="materias/dibujo-mecanico.html"
+                    class="enter-btn"
+                >
+                    ENTRAR A LA MATERIA ?
+                </a>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             PROBABILIDAD Y ESTADÍSTICA
+             ================================================= -->
+
+        <article
+            class="subject-card"
+            data-search="probabilidad estadística conjuntos eventos conteo datos"
+        >
+
+            <div class="subject-header statistics">
+
+                <div class="subject-icon">
+                    ??
+                </div>
+
+                <h3>
+                    Probabilidad y Estadística
+                </h3>
+
+                <p>
+                    Análisis de datos y probabilidad
+                </p>
+
+            </div>
+
+            <div class="subject-body">
+
+                <p>
+                    Aprende conceptos de probabilidad,
+                    estadística, conjuntos, eventos,
+                    análisis de datos y resolución de problemas.
+                </p>
+
+                <div class="topics">
+
+                    <span class="topic">Conjuntos</span>
+                    <span class="topic">Probabilidad</span>
+                    <span class="topic">Estadística</span>
+                    <span class="topic">Datos</span>
+
+                </div>
+
+                <!-- CAMBIA ESTE NOMBRE SI TU ARCHIVO TIENE OTRO NOMBRE -->
+
+                <a
+                    href="materias/probabilidad-estadistica.html"
+                    class="enter-btn"
+                >
+                    ENTRAR A LA MATERIA ?
+                </a>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             FRAMEWORKS
+             ================================================= -->
+
+        <article
+            class="subject-card"
+            data-search="frameworks programación html css javascript desarrollo web"
+        >
+
+            <div class="subject-header frameworks">
+
+                <div class="subject-icon">
+                    ??
+                </div>
+
+                <h3>
+                    Frameworks
+                </h3>
+
+                <p>
+                    Desarrollo de aplicaciones web
+                </p>
+
+            </div>
+
+            <div class="subject-body">
+
+                <p>
+                    Aprende herramientas y frameworks para
+                    desarrollar aplicaciones, interfaces web
+                    y proyectos utilizando tecnologías modernas.
+                </p>
+
+                <div class="topics">
+
+                    <span class="topic">HTML</span>
+                    <span class="topic">CSS</span>
+                    <span class="topic">JavaScript</span>
+                    <span class="topic">Frameworks</span>
+
+                </div>
+
+                <!-- CAMBIA ESTE NOMBRE SI TU ARCHIVO TIENE OTRO NOMBRE -->
+
+                <a
+                    href="materias/frameworks.html"
+                    class="enter-btn"
+                >
+                    ENTRAR A LA MATERIA ?
+                </a>
+
+            </div>
+
+        </article>
+
+
+    </div>
+
+
+    <div id="noResults">
+
+        No se encontró ninguna materia relacionada
+        con tu búsqueda.
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ACCESOS RÁPIDOS
+     ========================================================= -->
+
+<section class="quick-access" id="recursos">
+
+    <div class="section-title">
+
+        <h2>
+            Accesos rápidos
+        </h2>
+
+        <p>
+            Encuentra rápidamente los recursos del portal
+        </p>
+
+    </div>
+
+
+    <div class="quick-grid">
+
+
+        <a href="#" class="quick-card">
+
+            <div class="quick-icon">
+                ??
+            </div>
+
+            <h3>
+                Recursos
+            </h3>
+
+            <p>
+                Material de apoyo, documentos y contenido adicional.
+            </p>
+
+        </a>
+
+
+        <a href="#" class="quick-card">
+
+            <div class="quick-icon">
+                ??
+            </div>
+
+            <h3>
+                Laboratorio
+            </h3>
+
+            <p>
+                Actividades y prácticas para aplicar lo aprendido.
+            </p>
+
+        </a>
+
+
+        <a href="#" class="quick-card">
+
+            <div class="quick-icon">
+                ??
+            </div>
+
+            <h3>
+                Evaluaciones
+            </h3>
+
+            <p>
+                Ejercicios y evaluaciones de las materias.
+            </p>
+
+        </a>
+
+
+        <a href="#" class="quick-card">
+
+            <div class="quick-icon">
+                ??
+            </div>
+
+            <h3>
+                Videos
+            </h3>
+
+            <p>
+                Videos educativos y material audiovisual.
+            </p>
+
+        </a>
+
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     INFORMACIÓN
+     ========================================================= -->
+
+<section class="info" id="informacion">
+
+    <h2>
+        ¿Cómo utilizar este portal?
+    </h2>
+
+    <p>
+        Selecciona una de las materias para acceder
+        directamente a su contenido educativo. Cada
+        materia contiene sus propios temas, ejemplos,
+        ejercicios, prácticas y evaluaciones.
+    </p>
+
+</section>
+
+</main>
+
+
+<!-- =========================================================
+     PIE DE PÁGINA
+     ========================================================= -->
+
+<footer>
+
+    <div class="footer-title">
+        PORTAL EDUCATIVO
+    </div>
+
+    <div class="footer-text">
+        Mecanismos · Dibujo Mecánico ·
+        Probabilidad y Estadística · Frameworks
+    </div>
+
+    <br>
+
+    <div class="footer-text">
+        Sitio educativo desarrollado para GitHub Pages
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    function buscarMateria() {
+
+        const input =
+            document.getElementById("searchInput");
+
+        const filtro =
+            input.value.toLowerCase().trim();
+
+        const materias =
+            document.querySelectorAll(".subject-card");
+
+        let encontradas = 0;
+
+        materias.forEach(function(materia) {
+
+            const texto =
+                materia.dataset.search.toLowerCase();
+
+            if (texto.includes(filtro)) {
+
+                materia.style.display = "";
+
+                encontradas++;
+
+            } else {
+
+                materia.style.display = "none";
+
+            }
+
+        });
+
+        const mensaje =
+            document.getElementById("noResults");
+
+        if (encontradas === 0 && filtro !== "") {
+
+            mensaje.style.display = "block";
+
+        } else {
+
+            mensaje.style.display = "none";
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>
+```

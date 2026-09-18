@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprende Java desde Cero | Plataforma Interactiva</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Librería html2pdf para descargar reporte en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card-border: rgba(255, 255, 255, 0.1);
+            --primary: #6d28d9;
+            --primary-light: #8b5cf6;
+            --accent: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #050811;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Modal de Login / Datos Alumno */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .modal-box h2 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--code-bg);
+            border: 1px solid var(--bg-card-border);
+            color: var(--text-main);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Header / Navbar */
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--bg-card-border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .user-badge {
+            font-size: 0.85rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            max-width: 100%;
+            padding-bottom: 0.2rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--text-main);
+            background: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 12px rgba(109, 40, 217, 0.4);
+        }
+
+        .tab-btn.diag-btn {
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .tab-btn.diag-btn:hover {
+            background: rgba(251, 146, 60, 0.15);
+        }
+
+        .tab-btn.quiz-btn {
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .tab-btn.quiz-btn:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        /* Layout Main */
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 5rem;
+            max-height: calc(100vh - 6rem);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.4rem;
+        }
+
+        .sidebar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Main Content */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .parcial-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .parcial-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards & Topic Sections */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analogy {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        .analogy strong {
+            color: var(--accent);
+        }
+
+        /* Code Blocks */
+        pre, code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--bg-card-border);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        .keyword { color: #f43f5e; font-weight: bold; }
+        .class-name { color: #38bdf8; font-weight: bold; }
+        .method { color: #a78bfa; }
+        .string { color: #4ade80; }
+        .comment { color: #64748b; font-style: italic; }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--bg-card-border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+        }
+
+        /* Quiz Styles */
+        .quiz-question {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .quiz-question p {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .quiz-option input[type="radio"] {
+            accent-color: var(--accent);
+        }
+
+        .quiz-result-box {
+            background: var(--code-bg);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Buttons & Utility */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-green {
+            background: #10b981;
+        }
+
+        .btn-green:hover {
+            background: #059669;
+        }
+
+        .report-card {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .report-card h2, .report-card h3 {
+            color: #6d28d9;
+        }
+
+        .report-card table {
+            color: #0f172a;
+        }
+
+        .report-card th {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .report-card td, .report-card th {
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        /* Interactive Monkey Demo */
+        .monkey-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .monkey-container {
+            position: relative;
+            width: 200px;
+            height: 250px;
+            background: #1e293b;
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .monkey-part {
+            position: absolute;
+            background: rgba(56, 189, 248, 0.2);
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #fff;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .monkey-part:hover {
+            transform: scale(1.1);
+            background: var(--primary);
+        }
+
+        .part-head { top: 20px; width: 70px; height: 70px; }
+        .part-hand-left { top: 90px; left: 15px; width: 40px; height: 40px; }
+        .part-hand-right { top: 90px; right: 15px; width: 40px; height: 40px; }
+        .part-foot-left { bottom: 20px; left: 40px; width: 45px; height: 45px; }
+        .part-foot-right { bottom: 20px; right: 40px; width: 45px; height: 45px; }
+
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--bg-card-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #reportPrintArea, #reportPrintArea * {
+                visibility: visible;
+            }
+            #reportPrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                color: #000;
+                background: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal de Identificación -->
+    <div id="userModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>🎓 Registro de Alumno</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">
+                Ingresa tus datos para registrar tus evaluaciones y generar tus reportes académicos.
+            </p>
+            <div class="input-group">
+                <label for="inputNombre">Nombre Completo:</label>
+                <input type="text" id="inputNombre" placeholder="Ej. Juan Pérez González">
+            </div>
+            <button class="btn" style="width: 100%; margin-top: 0.5rem;" onclick="saveUserData()">Iniciar Plataforma</button>
+        </div>
+    </div>
+
+    <!-- Header / Nav -->
+    <header>
+        <div class="logo">
+            ☕ Java<span>Academy</span>
+        </div>
+        <div id="userDisplay" class="user-badge">Alumno: No registrado</div>
+        <nav>
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag1', this)">🔍 Diag P1</button>
+            <button class="tab-btn active" onclick="switchParcial('parcial1', this)">Parcial 1</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz1', this)">📝 Examen P1</button>
+
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag2', this)">🔍 Diag P2</button>
+            <button class="tab-btn" onclick="switchParcial('parcial2', this)">Parcial 2</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz2', this)">📝 Examen P2</button>
+
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag3', this)">🔍 Diag P3</button>
+            <button class="tab-btn" onclick="switchParcial('parcial3', this)">Parcial 3</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz3', this)">📝 Examen P3</button>
+
+            <button class="tab-btn" onclick="switchParcial('repaso', this)">⭐ Repaso & Swing</button>
+            <button class="tab-btn" onclick="switchParcial('glosario', this)">📖 Glosario</button>
+            <button class="tab-btn" onclick="switchParcial('reporte', this)">📊 Reporte / PDF</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Dinámico -->
+        <aside class="sidebar">
+            <h3 id="sidebar-title">Temario Parcial 1</h3>
+            <ul id="sidebar-list"></ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 1 -->
+            <div id="diag1" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 1</h2>
+                    <p>Cuestionario previo de saberes iniciales sobre lógica de programación y conceptos básicos antes de iniciar el módulo.</p>
+                </div>
+                <form id="formDiag1" class="card">
+                    <div id="diag1-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(1)">Calcular Diagnóstico Parcial 1</button>
+                    <div id="resultDiag1" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 1 -->
+            <div id="parcial1" class="parcial-content active">
+                <section id="p1-intro" class="card">
+                    <h2>1. Introducción a Java</h2>
+                    <p>Java es un lenguaje de programación de <strong>alto nivel</strong>, orientado a objetos, robusto y multiplataforma.</p>
+                </section>
+
+                <section id="p1-antecedentes" class="card">
+                    <h2>2. Antecedentes de Java</h2>
+                    <p>Creado por <strong>James Gosling</strong> en <em>Sun Microsystems</em> (1991). Su lema rector es: <strong>"Write Once, Run Anywhere" (WORA)</strong>.</p>
+                </section>
+
+                <section id="p1-frameworks" class="card">
+                    <h2>3. Frameworks: Definición y Características</h2>
+                    <p>Un <strong>Framework</strong> es una estructura base estandarizada sobre la cual se desarrolla un software, facilitando tareas comunes.</p>
+                </section>
+
+                <section id="p1-ides" class="card">
+                    <h2>4. Frameworks e IDEs para Java</h2>
+                    <ul>
+                        <li><strong>IDE:</strong> Entorno de desarrollo para escribir y depurar código (ej. NetBeans, IntelliJ, Eclipse).</li>
+                        <li><strong>Framework:</strong> Plataforma de bibliotecas y reglas (ej. Spring Boot, Jakarta EE).</li>
+                    </ul>
+                </section>
+
+                <section id="p1-entorno" class="card">
+                    <h2>5. Configuración del Entorno</h2>
+                    <ul>
+                        <li><strong>JDK:</strong> Kit de desarrollo con compilador (<code>javac</code>).</li>
+                        <li><strong>JRE:</strong> Entorno de ejecución de aplicaciones Java.</li>
+                        <li><strong>JVM:</strong> Máquina virtual que interpreta el Bytecode.</li>
+                    </ul>
+                </section>
+
+                <section id="p1-poo" class="card">
+                    <h2>6. Introducción a POO</h2>
+                    <p>Paradigma de programación que organiza el software en torno a objetos de la vida real mediante Clases y Atributos.</p>
+                </section>
+
+                <section id="p1-pilares" class="card">
+                    <h2>7. Pilares de la POO</h2>
+                    <ol>
+                        <li><strong>Abstracción:</strong> Enfocarse en características esenciales.</li>
+                        <li><strong>Encapsulamiento:</strong> Proteger atributos restringiendo accesos (<code>private</code>).</li>
+                        <li><strong>Herencia:</strong> Reutilización de código entre clases relativas.</li>
+                        <li><strong>Polimorfismo:</strong> Capacidad de realizar una misma acción de distintas formas.</li>
+                    </ol>
+                </section>
+
+                <section id="p1-estructura" class="card">
+                    <h2>8. Estructura Básica de un Programa</h2>
+<pre><code><span class="keyword">public class</span> <span class="class-name">HolaMundo</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        System.out.<span class="method">println</span>(<span class="string">"¡Hola desde Java!"</span>);
+    }
+}</code></pre>
+                </section>
+
+                <section id="p1-clases" class="card">
+                    <h2>9. Clases, Atributos y Métodos</h2>
+<pre><code><span class="keyword">public class</span> <span class="class-name">Persona</span> {
+    String nombre;
+    <span class="keyword">void</span> <span class="method">saludar</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Hola"</span>);
+    }
+}</code></pre>
+                </section>
+
+                <section id="p1-instanciar" class="card">
+                    <h2>10. Instanciar Objetos</h2>
+<pre><code><span class="class-name">Persona</span> p = <span class="keyword">new</span> <span class="class-name">Persona</span>();
+p.saludar();</code></pre>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 1 -->
+            <div id="quiz1" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 1 (15 Preguntas)</h2>
+                    <p>Evaluación sumativa de fin de módulo sobre todos los contenidos revisados en el Parcial 1.</p>
+                </div>
+                <form id="formQuiz1" class="card">
+                    <div id="quiz1-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(1)">Calcular Examen Parcial 1</button>
+                    <div id="resultQuiz1" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 2 -->
+            <div id="diag2" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 2</h2>
+                    <p>Cuestionario previo de entrada para medir conocimientos iniciales en funciones, arreglos y clases antes de desarrollar las lecturas del Parcial 2.</p>
+                </div>
+                <form id="formDiag2" class="card">
+                    <div id="diag2-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(2)">Calcular Diagnóstico Parcial 2</button>
+                    <div id="resultDiag2" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 2 DETALLADO -->
+            <div id="parcial2" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <h1 style="color: var(--accent); font-size: 1.6rem;">Parcial 2 – Introducción a la Programación Orientada a Objetos</h1>
+                    <p>En este bloque aprenderás a modularizar aplicaciones utilizando funciones y métodos, manejar la entrada de datos dinámica del usuario, trabajar con textos, estructurar colecciones fijas mediante arreglos y aplicar los pilares centrales de Herencia y Polimorfismo.</p>
+                </div>
+
+                <section id="p2-metodos" class="card">
+                    <h2>1. Métodos en Java</h2>
+                    <p>Un <strong>método</strong> es un conjunto de instrucciones agrupadas bajo un nombre que realizan una tarea específica. Promueven la reutilización de código y la modularidad.</p>
+                    <ul>
+                        <li><strong>Modificador de Acceso:</strong> Define la visibilidad (<code>public</code>, <code>private</code>, <code>protected</code>).</li>
+                        <li><strong>Tipo de Retorno:</strong> Especifica el dato devuelto (<code>int</code>, <code>String</code>, etc.) o <code>void</code> si no retorna nada.</li>
+                        <li><strong>Parámetros:</strong> Variables recibidas entre paréntesis.</li>
+                    </ul>
+<pre><code><span class="keyword">public class</span> <span class="class-name">Calculadora</span> {
+    <span class="comment">// Método con retorno y parámetros</span>
+    <span class="keyword">public int</span> <span class="method">sumar</span>(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+        <span class="keyword">return</span> a + b;
+    }
+
+    <span class="comment">// Método sin retorno (void)</span>
+    <span class="keyword">public void</span> <span class="method">mostrarMensaje</span>(String msg) {
+        System.out.<span class="method">println</span>(<span class="string">"Mensaje: "</span> + msg);
+    }
+}</code></pre>
+                </section>
+
+                <section id="p2-sobrecarga" class="card">
+                    <h2>2. Sobrecarga de Métodos en Java</h2>
+                    <p>La <strong>Sobrecarga (Overloading)</strong> ocurre cuando en una misma clase existen dos o más métodos con el mismo nombre pero con <strong>diferente lista de parámetros</strong> (diferente cantidad o distintos tipos de datos).</p>
+                    <div class="analogy">
+                        💡 <strong>Regla de Oro:</strong> El tipo de retorno por sí solo NO basta para diferenciar dos métodos sobrecargados; la firma debe cambiar en los argumentos.
+                    </div>
+<pre><code><span class="keyword">public class</span> <span class="class-name">Impresora</span> {
+    <span class="keyword">public void</span> <span class="method">imprimir</span>(<span class="keyword">int</span> numero) {
+        System.out.<span class="method">println</span>(<span class="string">"Número entero: "</span> + numero);
+    }
+
+    <span class="keyword">public void</span> <span class="method">imprimir</span>(String texto) {
+        System.out.<span class="method">println</span>(<span class="string">"Texto: "</span> + texto);
+    }
+
+    <span class="keyword">public void</span> <span class="method">imprimir</span>(<span class="keyword">double</span> n1, <span class="keyword">double</span> n2) {
+        System.out.<span class="method">println</span>(<span class="string">"Decimales: "</span> + n1 + <span class="string">", "</span> + n2);
+    }
+}</code></pre>
+                </section>
+
+                <section id="p2-constructores" class="card">
+                    <h2>3. Constructores</h2>
+                    <p>Un <strong>constructor</strong> es un método especial que se invoca automáticamente al instanciar un objeto con la palabra clave <code>new</code>. Se utiliza para inicializar atributos.</p>
+                    <ul>
+                        <li>Tiene el <strong>mismo nombre exacto de la clase</strong>.</li>
+                        <li><strong>No posee tipo de retorno</strong> (ni siquiera <code>void</code>).</li>
+                        <li>Pueden sobrecargarse (Constructor por defecto y Constructor parametrizado).</li>
+                    </ul>
+<pre><code><span class="keyword">public class</span> <span class="class-name">Estudiante</span> {
+    <span class="keyword">private</span> String nombre;
+    <span class="keyword">private int</span> edad;
+
+    <span class="comment">// Constructor Parametrizado</span>
+    <span class="keyword">public</span> <span class="class-name">Estudiante</span>(String nombre, <span class="keyword">int</span> edad) {
+        <span class="keyword">this</span>.nombre = nombre;
+        <span class="keyword">this</span>.edad = edad;
+    }
+}</code></pre>
+                </section>
+
+                <section id="p2-teclado" class="card">
+                    <h2>4. Entrada de Datos por Teclado</h2>
+                    <p>Java utiliza la clase <code>Scanner</code> pertenecente al paquete <code>java.util</code> para capturar datos introducidos por el usuario desde la consola estándar (<code>System.in</code>).</p>
+<pre><code><span class="keyword">import</span> java.util.Scanner;
+
+<span class="keyword">public class</span> <span class="class-name">EntradaDatos</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        Scanner teclado = <span class="keyword">new</span> Scanner(System.in);
+
+        System.out.<span class="method">print</span>(<span class="string">"Ingresa tu nombre: "</span>);
+        String nombre = teclado.<span class="method">nextLine</span>();
+
+        System.out.<span class="method">print</span>(<span class="string">"Ingresa tu edad: "</span>);
+        <span class="keyword">int</span> edad = teclado.<span class="method">nextInt</span>();
+
+        System.out.<span class="method">println</span>(<span class="string">"Hola "</span> + nombre + <span class="string">", tienes "</span> + edad + <span class="string">" años."</span>);
+    }
+}</code></pre>
+                </section>
+
+                <section id="p2-string" class="card">
+                    <h2>5. Métodos de la Clase String</h2>
+                    <p>Los objetos <code>String</code> en Java son inmutables. Poseen una amplia colección de métodos integrados para manipulación de cadenas:</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Método</th>
+                                    <th>Descripción</th>
+                                    <th>Ejemplo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>length()</code></td>
+                                    <td>Devuelve el número total de caracteres.</td>
+                                    <td><code>"Hola".length() -> 4</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>charAt(int index)</code></td>
+                                    <td>Devuelve el carácter en el índice especificado.</td>
+                                    <td><code>"Java".charAt(0) -> 'J'</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>equals(Object obj)</code></td>
+                                    <td>Compara el contenido de dos cadenas exactamente.</td>
+                                    <td><code>"A".equals("A") -> true</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>toUpperCase() / toLowerCase()</code></td>
+                                    <td>Convierte el texto a mayúsculas o minúsculas.</td>
+                                    <td><code>"hola".toUpperCase() -> "HOLA"</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>substring(int begin, int end)</code></td>
+                                    <td>Extrae una subcadena de texto.</td>
+                                    <td><code>"Código".substring(0, 3) -> "Cód"</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="p2-arreglos" class="card">
+                    <h2>6. Arreglos (Arrays)</h2>
+                    <p>Un <strong>arreglo</strong> es una estructura de datos estática que almacena una colección de elementos de un mismo tipo en posiciones consecutivas de memoria.</p>
+<pre><code><span class="comment">// Declaración e inicialización de un arreglo de 5 posiciones</span>
+<span class="keyword">int</span>[] calificaciones = <span class="keyword">new int</span>[5];
+
+<span class="comment">// Asignación de valores</span>
+calificaciones[0] = 95;
+calificaciones[1] = 88;
+
+<span class="comment">// Recorrido con un bucle for-each</span>
+<span class="keyword">for</span> (<span class="keyword">int</span> nota : calificaciones) {
+    System.out.<span class="method">println</span>(<span class="string">"Nota: "</span> + nota);
+}</code></pre>
+                </section>
+
+                <section id="p2-herencia-poli" class="card">
+                    <h2>7. Herencia y Polimorfismo en Java</h2>
+                    <p><strong>Herencia:</strong> Permite que una clase hija (subclase) adquiera atributos y métodos de una clase padre (superclase) mediante la palabra <code>extends</code>.</p>
+                    <p><strong>Polimorfismo:</strong> Capacidad de objetos de distintas subclases para responder al mismo mensaje o invocación de método de manera propia usando la sobreescritura (<code>@Override</code>).</p>
+<pre><code><span class="comment">// Clase Padre</span>
+<span class="keyword">class</span> <span class="class-name">Animal</span> {
+    <span class="keyword">public void</span> <span class="method">hacerSonido</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Haciendo sonido genérico..."</span>);
+    }
+}
+
+<span class="comment">// Clase Hija que hereda y aplica Polimorfismo</span>
+<span class="keyword">class</span> <span class="class-name">Perro</span> <span class="keyword">extends</span> <span class="class-name">Animal</span> {
+    @Override
+    <span class="keyword">public void</span> <span class="method">hacerSonido</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"El perro ladra: ¡Guau guau!"</span>);
+    }
+}</code></pre>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 2 -->
+            <div id="quiz2" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 2 (15 Preguntas)</h2>
+                    <p>Examen sumativo de cierre sobre métodos, sobrecarga, constructores, Scanner, Strings, arreglos y herencia.</p>
+                </div>
+                <form id="formQuiz2" class="card">
+                    <div id="quiz2-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(2)">Calcular Examen Parcial 2</button>
+                    <div id="resultQuiz2" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 3 -->
+            <div id="diag3" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 3</h2>
+                    <p>Cuestionario previo de entrada para evaluar nociones de interfaces de usuario y componentes visuales previo a iniciar el tema.</p>
+                </div>
+                <form id="formDiag3" class="card">
+                    <div id="diag3-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(3)">Calcular Diagnóstico Parcial 3</button>
+                    <div id="resultDiag3" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 3 DETALLADO -->
+            <div id="parcial3" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h1 style="color: var(--accent-green); font-size: 1.6rem;">Parcial 3 – Integración de Frameworks y Addons</h1>
+                    <p>En este módulo aprenderás a diseñar e implementar Interfaces Gráficas de Usuario (GUI) ricas e interactivas utilizando la librería Java Swing, con el uso de eventos, gestores de diseño y la construcción de un proyecto integrador.</p>
+                </div>
+
+                <section id="p3-gui" class="card">
+                    <h2>1. Interfaz de Usuario (GUI)</h2>
+                    <p>Una <strong>GUI (Graphical User Interface)</strong> reemplaza la interfaz de consola por ventanas visuales con botones, menús y cajas de texto. En Java, la biblioteca principal estándar es <strong>Swing</strong> (perteneciente al paquete <code>javax.swing</code>), construida sobre la base AWT.</p>
+                    <div class="analogy">
+                        💡 <strong>Ventaja de Swing:</strong> Al ser un conjunto de componentes "ligeros" (Lightweight), se dibujan de manera uniforme independientemente del sistema operativo.
+                    </div>
+                </section>
+
+                <section id="p3-componentes" class="card">
+                    <h2>2. Componentes Gráficos</h2>
+                    <p>Los componentes visuales fundamentales de Swing permiten construir controles e interacciones completas:</p>
+                    <ul>
+                        <li><code>JFrame</code>: Ventana principal contenedora con barra de título y botones de cerrar/minimizar.</li>
+                        <li><code>JPanel</code>: Contenedor genérico para agrupar y organizar componentes secundarios.</li>
+                        <li><code>JLabel</code>: Muestra cadenas de texto o imágenes no editables.</li>
+                        <li><code>JTextField</code>: Caja de texto para entrada de una sola línea de datos.</li>
+                        <li><code>JButton</code>: Botón de acción interactivo que dispara eventos de clic (<code>ActionListener</code>).</li>
+                        <li><code>JComboBox</code>: Lista desplegable de opciones seleccionables.</li>
+                    </ul>
+                </section>
+
+                <section id="p3-metodos-gui" class="card">
+                    <h2>3. Métodos Fundamentales en GUI</h2>
+                    <p>Principales métodos para inicializar y controlar la ejecución de componentes visuales:</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Método</th>
+                                    <th>Uso en Swing</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>setSize(int width, int height)</code></td>
+                                    <td>Establece el ancho y el alto en píxeles de la ventana o componente.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>setTitle(String title)</code></td>
+                                    <td>Define el texto del título en la barra superior del <code>JFrame</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>setDefaultCloseOperation(...)</code></td>
+                                    <td>Define la acción al dar clic en la 'X' (ej. <code>JFrame.EXIT_ON_CLOSE</code>).</td>
+                                </tr>
+                                <tr>
+                                    <td><code>setVisible(boolean b)</code></td>
+                                    <td>Muestra (<code>true</code>) u oculta (<code>false</code>) la ventana en pantalla.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>add(Component comp)</code></td>
+                                    <td>Inserta un componente gráfico dentro del contenedor activo.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="p3-diseno" class="card">
+                    <h2>4. Diseño de Interfaces Gráficas (Layout Managers)</h2>
+                    <p>Los <strong>Layout Managers</strong> posicionan automáticamente los componentes según el tamaño de la ventana:</p>
+                    <ul>
+                        <li><code>FlowLayout</code>: Acomoda componentes uno al lado del otro en secuencia horizontal.</li>
+                        <li><code>BorderLayout</code>: Divide el contenedor en 5 regiones (NORTH, SOUTH, EAST, WEST, CENTER).</li>
+                        <li><code>GridLayout</code>: Organiza los elementos en una rejilla rectangular uniforme de filas y columnas.</li>
+                    </ul>
+                </section>
+
+                <section id="p3-proyecto" class="card">
+                    <h2>5. Proyecto Final Integrador</h2>
+                    <p>El proyecto final consiste en la creación de una aplicación de escritorio completa integrando las 3 capas esenciales: **Controladores de Interfaz Gráfica**, **Modelos de POO** y **Manejo de Eventos/Archivos**.</p>
+<pre><code><span class="keyword">import</span> javax.swing.*;
+<span class="keyword">import</span> java.awt.event.*;
+
+<span class="keyword">public class</span> <span class="class-name">MiVentanaSimple</span> <span class="keyword">extends</span> JFrame {
+    <span class="keyword">public</span> <span class="class-name">MiVentanaSimple</span>() {
+        <span class="method">setTitle</span>(<span class="string">"Proyecto GUI Java"</span>);
+        <span class="method">setSize</span>(300, 200);
+        <span class="method">setDefaultCloseOperation</span>(EXIT_ON_CLOSE);
+
+        JButton btn = <span class="keyword">new</span> JButton(<span class="string">"¡Hacer Clic!"</span>);
+        btn.<span class="method">addActionListener</span>(e -> JOptionPane.<span class="method">showMessageDialog</span>(<span class="keyword">this</span>, <span class="string">"¡Evento ejecutado con éxito!"</span>));
+
+        <span class="method">add</span>(btn);
+        <span class="method">setVisible</span>(<span class="keyword">true</span>);
+    }
+}</code></pre>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 3 -->
+            <div id="quiz3" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 3 (15 Preguntas)</h2>
+                    <p>Examen sumativo final sobre GUIs, eventos, componentes Swing, layouts y desarrollo de proyectos.</p>
+                </div>
+                <form id="formQuiz3" class="card">
+                    <div id="quiz3-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(3)">Calcular Examen Parcial 3</button>
+                    <div id="resultQuiz3" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- REPASO GENERAL & SWING APP -->
+            <div id="repaso" class="parcial-content">
+                <section class="card">
+                    <h2>🐒 Repaso General: Aplicación Swing Interactive Monkey Body Parts</h2>
+                    <p>Demostración interactiva y código ejecutable en Java Swing para la aplicación del mono que emite sonidos en inglés.</p>
+                    
+                    <div class="analogy">
+                        💡 <strong>Simulación Web:</strong> Haz clic en las partes del esquema del mono a continuación para interactuar.
+                    </div>
+
+                    <!-- Simulación Interactiva -->
+                    <div class="monkey-demo">
+                        <div class="monkey-container">
+                            <div class="monkey-part part-head" onclick="playAudio('Head')">Head</div>
+                            <div class="monkey-part part-hand-left" onclick="playAudio('Left Hand')">Hand</div>
+                            <div class="monkey-part part-hand-right" onclick="playAudio('Right Hand')">Hand</div>
+                            <div class="monkey-part part-foot-left" onclick="playAudio('Left Foot')">Foot</div>
+                            <div class="monkey-part part-foot-right" onclick="playAudio('Right Foot')">Foot</div>
+                        </div>
+                        <p id="monkeyOutput" style="color: var(--accent); font-weight: bold;">Haz clic en una parte del mono...</p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>💻 Código Completo Ejecutable en Java Swing</h2>
+<pre><code><span class="keyword">import</span> javax.swing.*;
+<span class="keyword">import</span> java.awt.*;
+<span class="keyword">import</span> java.awt.event.*;
+<span class="keyword">import</span> javax.sound.sampled.*;
+<span class="keyword">import</span> java.io.File;
+
+<span class="keyword">public class</span> <span class="class-name">MonkeyBodyApp</span> <span class="keyword">extends</span> JFrame {
+
+    <span class="keyword">private</span> JLabel lblStatus;
+
+    <span class="keyword">public</span> <span class="class-name">MonkeyBodyApp</span>() {
+        <span class="method">setTitle</span>(<span class="string">"Interactive Monkey Parts - Repaso Swing"</span>);
+        <span class="method">setSize</span>(400, 500);
+        <span class="method">setDefaultCloseOperation</span>(JFrame.EXIT_ON_CLOSE);
+        <span class="method">setLayout</span>(<span class="keyword">new</span> BorderLayout());
+
+        lblStatus = <span class="keyword">new</span> JLabel(<span class="string">"Click on any monkey part!"</span>, SwingConstants.CENTER);
+        lblStatus.setFont(<span class="keyword">new</span> Font(<span class="string">"Arial"</span>, Font.BOLD, 16));
+        <span class="method">add</span>(lblStatus, BorderLayout.NORTH);
+
+        MonkeyPanel monkeyPanel = <span class="keyword">new</span> MonkeyPanel();
+        <span class="method">add</span>(monkeyPanel, BorderLayout.CENTER);
+
+        <span class="method">setVisible</span>(<span class="keyword">true</span>);
+    }
+
+    <span class="keyword">class</span> <span class="class-name">MonkeyPanel</span> <span class="keyword">extends</span> JPanel {
+        <span class="keyword">public</span> <span class="class-name">MonkeyPanel</span>() {
+            <span class="method">addMouseListener</span>(<span class="keyword">new</span> MouseAdapter() {
+                @Override
+                <span class="keyword">public void</span> <span class="method">mouseClicked</span>(MouseEvent e) {
+                    <span class="keyword">int</span> x = e.getX();
+                    <span class="keyword">int</span> y = e.getY();
+
+                    <span class="keyword">if</span> (x >= 150 && x <= 250 && y >= 40 && y <= 140) {
+                        <span class="method">triggerSound</span>(<span class="string">"Head"</span>, <span class="string">"sounds/head.wav"</span>);
+                    } <span class="keyword">else if</span> (x >= 80 && x <= 140 && y >= 160 && y <= 220) {
+                        <span class="method">triggerSound</span>(<span class="string">"Hand"</span>, <span class="string">"sounds/hand.wav"</span>);
+                    } <span class="keyword">else if</span> (x >= 260 && x <= 320 && y >= 160 && y <= 220) {
+                        <span class="method">triggerSound</span>(<span class="string">"Hand"</span>, <span class="string">"sounds/hand.wav"</span>);
+                    } <span class="keyword">else if</span> (x >= 120 && x <= 170 && y >= 320 && y <= 380) {
+                        <span class="method">triggerSound</span>(<span class="string">"Foot"</span>, <span class="string">"sounds/foot.wav"</span>);
+                    } <span class="keyword">else if</span> (x >= 230 && x <= 280 && y >= 320 && y <= 380) {
+                        <span class="method">triggerSound</span>(<span class="string">"Foot"</span>, <span class="string">"sounds/foot.wav"</span>);
+                    }
+                }
+            });
+        }
+
+        @Override
+        <span class="keyword">protected void</span> <span class="method">paintComponent</span>(Graphics g) {
+            <span class="keyword">super</span>.paintComponent(g);
+            g.setColor(Color.ORANGE);
+            g.fillOval(150, 40, 100, 100);
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(160, 140, 80, 180);
+            g.setColor(Color.ORANGE);
+            g.fillOval(80, 160, 60, 60);
+            g.fillOval(260, 160, 60, 60);
+            g.fillOval(120, 320, 50, 60);
+            g.fillOval(230, 320, 50, 60);
+        }
+    }
+
+    <span class="keyword">private void</span> <span class="method">triggerSound</span>(String partName, String soundFilePath) {
+        lblStatus.setText(<span class="string">"Body Part: "</span> + partName);
+        <span class="method">playSound</span>(soundFilePath);
+    }
+
+    <span class="keyword">private void</span> <span class="method">playSound</span>(String filePath) {
+        <span class="keyword">try</span> {
+            File file = <span class="keyword">new</span> File(filePath);
+            <span class="keyword">if</span> (file.exists()) {
+                AudioInputStream audio = AudioSystem.getAudioInputStream(file);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audio);
+                clip.start();
+            }
+        } <span class="keyword">catch</span> (Exception ex) {
+            System.out.println(<span class="string">"Audio error: "</span> + ex.getMessage());
+        }
+    }
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        SwingUtilities.invokeLater(() -> <span class="keyword">new</span> MonkeyBodyApp());
+    }
+}</code></pre>
+                </section>
+            </div>
+
+            <!-- GLOSARIO DE TÉRMINOS -->
+            <div id="glosario" class="parcial-content">
+                <section class="card">
+                    <h2>📖 Glosario de Términos Java</h2>
+                    <p>Consulta rápida de conceptos clave del lenguaje:</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Término</th>
+                                    <th>Concepto y Significado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>JDK</strong></td>
+                                    <td>Java Development Kit. Conjunto de herramientas de software para desarrollo en Java.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>JVM</strong></td>
+                                    <td>Java Virtual Machine. Máquina virtual que ejecuta el Bytecode de Java.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Bytecode</strong></td>
+                                    <td>Código intermedio compilado de Java con extensión <code>.class</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Clase</strong></td>
+                                    <td>Plantilla o molde para construir objetos.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Objeto</strong></td>
+                                    <td>Instancia viva en memoria de una clase con atributos y métodos.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Encapsulamiento</strong></td>
+                                    <td>Ocultamiento del acceso directo a los datos internos de un objeto.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Herencia</strong></td>
+                                    <td>Mecanismo para crear clases derivadas compartiendo atributos y métodos.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Polimorfismo</strong></td>
+                                    <td>Capacidad de responder de manera propia según la instancia específica.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Swing</strong></td>
+                                    <td>Biblioteca gráfica ligera para construir interfaces gráficas de usuario.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sobrecarga</strong></td>
+                                    <td>Métodos en una misma clase con el mismo nombre pero diferente firma.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- REPORTE DE EXÁMENES Y PDF -->
+            <div id="reporte" class="parcial-content">
+                <div class="card">
+                    <h2>📊 Reporte Académico de Evaluaciones</h2>
+                    <p>Resultados detallados diferenciados entre Evaluaciones Diagnósticas y Exámenes Parciales.</p>
+                    <div class="btn-group" style="margin-top: 1rem;">
+                        <button class="btn" onclick="window.print()">🖨️ Imprimir Reporte</button>
+                        <button class="btn btn-green" onclick="generatePDF()">📄 Descargar Reporte PDF</button>
+                    </div>
+                </div>
+
+                <div id="reportPrintArea" class="report-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #6d28d9; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <h2 style="margin:0;">☕ JavaAcademy - Reporte Oficial</h2>
+                            <p style="margin:0; font-size: 0.9rem; color: #475569;">Plataforma Académica de Evaluaciones Diagnósticas y Sumativas</p>
+                        </div>
+                        <div style="text-align: right; font-size: 0.85rem; color: #64748b;">
+                            Fecha: <span id="reportDate">--/--/----</span>
+                        </div>
+                    </div>
+
+                    <h3>📌 Información del Estudiante</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <tr>
+                                <td><strong>Nombre Alumno:</strong></td>
+                                <td id="repNombre">No registrado</td>
+                                <td><strong>Matrícula:</strong></td>
+                                <td id="repMatricula">N/A</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Grupo:</strong></td>
+                                <td id="repGrupo">N/A</td>
+                                <td><strong>Estatus:</strong></td>
+                                <td>Activo</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>🔍 Evaluaciones Diagnósticas (Entrada)</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Módulo</th>
+                                    <th>Aciertos</th>
+                                    <th>Diagnóstico (Base 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Diagnóstica Parcial 1</td>
+                                    <td id="repD1Score">0 / 5</td>
+                                    <td id="repD1Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnóstica Parcial 2</td>
+                                    <td id="repD2Score">0 / 5</td>
+                                    <td id="repD2Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnóstica Parcial 3</td>
+                                    <td id="repD3Score">0 / 5</td>
+                                    <td id="repD3Grade">0.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>📝 Exámenes Sumativos por Parcial (Cierre)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Evaluación</th>
+                                    <th>Aciertos</th>
+                                    <th>Calificación (Base 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Examen Parcial 1: Fundamentos y POO</td>
+                                    <td id="repP1Score">0 / 15</td>
+                                    <td id="repP1Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Examen Parcial 2: Métodos y Arreglos</td>
+                                    <td id="repP2Score">0 / 15</td>
+                                    <td id="repP2Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Examen Parcial 3: GUI, Swing e Integración</td>
+                                    <td id="repP3Score">0 / 15</td>
+                                    <td id="repP3Grade">0.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 2px solid #6d28d9; padding: 1.2rem; border-radius: 8px; margin-top: 1.5rem; text-align: center;">
+                        <h3 style="margin: 0; color: #0f172a;">PROMEDIO GENERAL DE EXÁMENES</h3>
+                        <p id="repPromedio" style="font-size: 2rem; font-weight: bold; color: #6d28d9; margin: 0.5rem 0 0 0;">0.0 / 10</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Aprende Java desde Cero &copy; 2026 - Plataforma de Aprendizaje Interactivo</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        // Datos del Alumno y Puntuaciones Separadas
+        const userData = {
+            matricula: 'N/A',
+            nombre: '',
+            grupo: 'N/A',
+            diagScores: { 1: 0, 2: 0, 3: 0 },
+            quizScores: { 1: 0, 2: 0, 3: 0 }
+        };
+
+        function saveUserData() {
+            const nom = document.getElementById('inputNombre').value.trim();
+
+            if (!nom) {
+                alert('Por favor ingresa tu nombre completo.');
+                return;
+            }
+
+            userData.nombre = nom;
+            userData.matricula = 'N/A';
+            userData.grupo = 'N/A';
+
+            document.getElementById('userDisplay').textContent = `Alumno: ${nom}`;
+            document.getElementById('userModal').style.display = 'none';
+
+            updateReportTable();
+        }
+
+        // Sidebar Dinámica
+        const sidebarContents = {
+            diag1: { title: "Diag P1", items: [{ name: "Cuestionario Entrada P1", link: "#formDiag1" }] },
+            parcial1: {
+                title: "Temario Parcial 1",
+                items: [
+                    { name: "1. Intro a Java", link: "#p1-intro" },
+                    { name: "2. Antecedentes", link: "#p1-antecedentes" },
+                    { name: "3. Frameworks", link: "#p1-frameworks" },
+                    { name: "4. IDEs vs Frameworks", link: "#p1-ides" },
+                    { name: "5. Configuración Entorno", link: "#p1-entorno" },
+                    { name: "6. Intro a POO", link: "#p1-poo" },
+                    { name: "7. Pilares de POO", link: "#p1-pilares" },
+                    { name: "8. Estructura Básica", link: "#p1-estructura" },
+                    { name: "9. Clases y Atributos", link: "#p1-clases" },
+                    { name: "10. Instanciar Objetos", link: "#p1-instanciar" }
+                ]
+            },
+            quiz1: { title: "Examen P1", items: [{ name: "Ir al Examen P1", link: "#formQuiz1" }] },
+            
+            diag2: { title: "Diag P2", items: [{ name: "Cuestionario Entrada P2", link: "#formDiag2" }] },
+            parcial2: {
+                title: "Temario Parcial 2",
+                items: [
+                    { name: "1. Métodos en Java", link: "#p2-metodos" },
+                    { name: "2. Sobrecarga de Métodos", link: "#p2-sobrecarga" },
+                    { name: "3. Constructores", link: "#p2-constructores" },
+                    { name: "4. Entrada por Teclado", link: "#p2-teclado" },
+                    { name: "5. Métodos de String", link: "#p2-string" },
+                    { name: "6. Arreglos (Arrays)", link: "#p2-arreglos" },
+                    { name: "7. Herencia y Polimorfismo", link: "#p2-herencia-poli" }
+                ]
+            },
+            quiz2: { title: "Examen P2", items: [{ name: "Ir al Examen P2", link: "#formQuiz2" }] },
+
+            diag3: { title: "Diag P3", items: [{ name: "Cuestionario Entrada P3", link: "#formDiag3" }] },
+            parcial3: {
+                title: "Temario Parcial 3",
+                items: [
+                    { name: "1. Interfaz de Usuario (GUI)", link: "#p3-gui" },
+                    { name: "2. Componentes Gráficos", link: "#p3-componentes" },
+                    { name: "3. Métodos GUI", link: "#p3-metodos-gui" },
+                    { name: "4. Diseño de Interfaces", link: "#p3-diseno" },
+                    { name: "5. Proyecto Final", link: "#p3-proyecto" }
+                ]
+            },
+            quiz3: { title: "Examen P3", items: [{ name: "Ir al Examen P3", link: "#formQuiz3" }] },
+
+            repaso: { title: "Repaso & Swing", items: [{ name: "App del Mono Swing", link: "#repaso" }] },
+            glosario: { title: "Glosario", items: [{ name: "Conceptos Clave", link: "#glosario" }] },
+            reporte: { title: "Reportes", items: [{ name: "Resultados & PDF", link: "#reporte" }] }
+        };
+
+        function updateSidebar(tabId) {
+            const sidebarTitle = document.getElementById('sidebar-title');
+            const sidebarList = document.getElementById('sidebar-list');
+            const data = sidebarContents[tabId];
+
+            if (data && sidebarTitle && sidebarList) {
+                sidebarTitle.textContent = data.title;
+                sidebarList.innerHTML = '';
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${item.link}">${item.name}</a>`;
+                    sidebarList.appendChild(li);
+                });
+            }
+        }
+
+        // Banco de Diagnósticos (5 preguntas de entrada por parcial)
+        const diagQuestionsData = {
+            1: [
+                { q: "1. ¿Java es un lenguaje interpretado totalmente o compilado a Bytecode?", options: ["Compilado directamente a binario nativo", "Compilado a Bytecode y ejecutado por la JVM", "Solo interpretado", "Solo de scripting"], answer: 1 },
+                { q: "2. ¿Qué programa compila los archivos .java a .class?", options: ["javac", "java", "jvm", "jar"], answer: 0 },
+                { q: "3. ¿Qué representa la POO?", options: ["Programación Orientada a Objetos", "Procesamiento Operativo Óptimo", "Prácticas Operativas Organizadas", "Plataforma Online Oficial"], answer: 0 },
+                { q: "4. ¿Cuál de estos es un tipo de dato primitivo en Java?", options: ["String", "int", "Scanner", "ArrayList"], answer: 1 },
+                { q: "5. ¿Cuál es la extensión de un código fuente Java?", options: [".class", ".java", ".exe", ".jar"], answer: 1 }
+            ],
+            2: [
+                { q: "1. Un método en Java sirve primordialmente para:", options: ["Agrupar instrucciones reutilizables", "Crear la interfaz gráfica", "Compilar el programa", "Almacenar archivos de texto"], answer: 0 },
+                { q: "2. ¿Qué palabra clave indica que un método no devuelve ningún valor?", options: ["null", "empty", "void", "static"], answer: 2 },
+                { q: "3. ¿Cuál es el primer índice en cualquier arreglo en Java?", options: ["1", "0", "-1", "Depende del tamaño"], answer: 1 },
+                { q: "4. ¿Qué clase permite leer texto desde el teclado por consola?", options: ["Console", "Scanner", "Input", "Reader"], answer: 1 },
+                { q: "5. ¿Qué palabra reservada establece relación de herencia entre dos clases?", options: ["implements", "extends", "super", "this"], answer: 1 }
+            ],
+            3: [
+                { q: "1. ¿Qué significa GUI?", options: ["Graphical User Interface", "Global User Identifier", "Group Utility Interface", "General Unit Integrator"], answer: 0 },
+                { q: "2. Biblioteca estándar para crear interfaces gráficas ligeras en Java:", options: ["AWT Básica", "Java Swing", "JavaFX Pro", "HTML5"], answer: 1 },
+                { q: "3. ¿Qué componente de Swing representa una ventana con bordes y título?", options: ["JPanel", "JFrame", "JLabel", "JButton"], answer: 1 },
+                { q: "4. ¿Qué componente se utiliza para que el usuario escriba un texto corto?", options: ["JTextField", "JLabel", "JDialog", "JMenuItem"], answer: 0 },
+                { q: "5. ¿Qué elemento organiza la posición de componentes en una ventana?", options: ["Class Manager", "Layout Manager", "Font Manager", "Border Style"], answer: 1 }
+            ]
+        };
+
+        // Banco de Exámenes Parciales (15 preguntas sumativas por parcial)
+        const quizQuestionsData = {
+            1: [
+                { q: "1. ¿Quién fue el creador principal de Java?", options: ["Dennis Ritchie", "James Gosling", "Bjarne Stroustrup", "Guido van Rossum"], answer: 1 },
+                { q: "2. ¿Cuál era el nombre original de Java?", options: ["Oak", "C++ Plus", "CoffeeScript", "JavaBeans"], answer: 0 },
+                { q: "3. ¿Qué significa la sigla WORA en Java?", options: ["Write Once, Read Anywhere", "Write Once, Run Anywhere", "Work On Real Applications", "Web-Oriented Runtime Architecture"], answer: 1 },
+                { q: "4. ¿Cuál componente de Java se encarga de compilar el código fuente a Bytecode?", options: ["JVM", "JRE", "JDK", "IDE"], answer: 2 },
+                { q: "5. ¿Qué componente ejecuta el Bytecode de Java en cualquier SO?", options: ["JVM (Java Virtual Machine)", "JDK", "API Java", "Eclipse"], answer: 0 },
+                { q: "6. ¿Qué es un IDE?", options: ["Un marco de trabajo prefabricado", "Un Entorno de Desarrollo Integrado para escribir código", "El compilador de Java", "Un motor de base de datos"], answer: 1 },
+                { q: "7. ¿Cuál es la firma correcta del método principal en Java?", options: ["public void main(String args)", "public static void main(String[] args)", "static public void Main(String args[])", "void main(String[] args)"], answer: 1 },
+                { q: "8. En POO, ¿qué representa una 'Clase'?", options: ["Un objeto físico en memoria", "Un plantilla o molde para crear objetos", "Un método de ordenamiento", "Una variable global"], answer: 1 },
+                { q: "9. ¿Qué palabra reservada se usa para crear una nueva instancia de un objeto?", options: ["create", "make", "new", "instance"], answer: 2 },
+                { q: "10. ¿Cuál de los siguientes NO es un pilar fundamental de la POO?", options: ["Encapsulamiento", "Abstracción", "Compilación", "Herencia"], answer: 2 },
+                { q: "11. ¿Qué pilar de la POO permite ocultar los datos internos de un objeto?", options: ["Polimorfismo", "Encapsulamiento", "Herencia", "Abstracción"], answer: 1 },
+                { q: "12. ¿Cuál es la extensión de los archivos compilados de Java?", options: [".java", ".exe", ".class", ".bin"], answer: 2 },
+                { q: "13. ¿Qué instrucción se utiliza para imprimir una línea en la consola de Java?", options: ["Console.WriteLine()", "printf()", "System.out.println()", "echo()"], answer: 2 },
+                { q: "14. Los atributos de una clase representan:", options: ["Las acciones del objeto", "Las características o estado del objeto", "Las funciones de sistema", "Las librerías importadas"], answer: 1 },
+                { q: "15. Un método en una clase representa:", options: ["Los datos almacenados", "Las acciones o comportamientos del objeto", "El nombre de la clase", "El tipo de archivo"], answer: 1 }
+            ],
+            2: [
+                { q: "1. ¿Qué es la sobrecarga de métodos en Java?", options: ["Crear un método dentro de otro", "Definir varios métodos con el mismo nombre y diferentes parámetros", "Eliminar un método repetido", "Llamar a un método sin parar"], answer: 1 },
+                { q: "2. Un constructor en Java se distingue por:", options: ["Devolver un tipo String", "Llevar la palabra 'void'", "Tener el mismo nombre exacto de la clase y no declarar tipo de retorno", "Ser siempre privado"], answer: 2 },
+                { q: "3. ¿Qué clase del paquete java.util nos permite leer entrada por teclado?", options: ["SystemInput", "Scanner", "KeyboardReader", "InputStream"], answer: 1 },
+                { q: "4. ¿Qué retorna el método .length() en una cadena String?", options: ["El tamaño en bytes", "El número de caracteres de la cadena", "La última posición", "True si no está vacía"], answer: 1 },
+                { q: "5. ¿Cuál es el método adecuado para comparar el contenido textual de dos Strings?", options: ["==", "equals()", "compare()", "isEqual()"], answer: 1 },
+                { q: "6. ¿Cómo se accede al primer elemento de un arreglo llamado 'datos'?", options: ["datos[1]", "datos[0]", "datos.first()", "datos.get(1)"], answer: 1 },
+                { q: "7. ¿Qué palabra reservada se utiliza para aplicar Herencia entre clases?", options: ["implements", "extends", "inherits", "super"], answer: 1 },
+                { q: "8. ¿Qué anotación se utiliza al hacer sobreescritura de un método heredado?", options: ["@Overload", "@Override", "@NewMethod", "@Inherit"], answer: 1 },
+                { q: "9. ¿Qué palabra reservada hace referencia a la clase padre?", options: ["this", "super", "parent", "base"], answer: 1 },
+                { q: "10. ¿Cuál es el resultado de 'java'.toUpperCase()?", options: ["Java", "JAVA", "java", "Error"], answer: 1 },
+                { q: "11. Un arreglo en Java se caracteriza por ser una estructura de datos:", options: ["Dinámica e infinita", "Estática de elementos del mismo tipo", "Que solo acepta números enteros", "Heterogénea"], answer: 1 },
+                { q: "12. ¿Qué ocurre si intentas acceder a un índice fuera del rango en un Array?", options: ["Retorna null", "Retorna 0", "Lanza la excepción ArrayIndexOutOfBoundsException", "El programa continúa sin problemas"], answer: 2 },
+                { q: "13. La capacidad de tratar a un objeto de una clase hija como si fuera de su clase padre se denomina:", options: ["Polimorfismo", "Encapsulamiento", "Abstracción", "Instanciación"], answer: 0 },
+                { q: "14. ¿Qué método de la clase Scanner lee una línea de texto completa?", options: ["nextInt()", "nextLine()", "nextString()", "readLine()"], answer: 1 },
+                { q: "15. ¿Cuál es la sintaxis correcta para declarar un arreglo de enteros de tamaño 10?", options: ["int array = new int[10];", "int[] array = new int[10];", "int array[10];", "Array int = new Array(10);"], answer: 1 }
+            ],
+            3: [
+                { q: "1. ¿Qué significan las siglas GUI?", options: ["General User Interface", "Graphical User Interface", "Global Unified Interface", "Guided User Interaction"], answer: 1 },
+                { q: "2. ¿Cuál paquete nativo de Java proporciona componentes gráficos ligeros (Swing)?", options: ["java.awt", "javax.swing", "java.gui", "java.io"], answer: 1 },
+                { q: "3. ¿Qué clase representa una ventana principal completa en Swing?", options: ["JPanel", "JButton", "JFrame", "JLabel"], answer: 2 },
+                { q: "4. Componente usado habitualmente para capturar texto simple escrito por el usuario:", options: ["JLabel", "JTextField", "JMenu", "JCheckBox"], answer: 1 },
+                { q: "5. ¿Qué método hace visible un marco gráfico JFrame?", options: ["show()", "open()", "setVisible(true)", "display()"], answer: 2 },
+                { q: "6. Componente de Swing para mostrar etiquetas de texto o imágenes no editables:", options: ["JLabel", "JButton", "JTextArea", "JList"], answer: 0 },
+                { q: "7. ¿Qué método asigna las dimensiones de tamaño a un JFrame?", options: ["setBounds()", "setSize()", "setDimension()", "resize()"], answer: 1 },
+                { q: "8. Un Layout Manager en Java se encarga de:", options: ["Conectar la base de datos", "Organizar la posición y tamaño de los componentes dentro de un contenedor", "Compilar el código gráfico", "Manejar los archivos de imagen"], answer: 1 },
+                { q: "9. ¿Cuál de los siguientes es un Layout Manager estándar?", options: ["BorderLayout", "WindowLayout", "ScreenLayout", "ControlLayout"], answer: 0 },
+                { q: "10. ¿Qué método define la acción al cerrar una ventana JFrame?", options: ["setDefaultCloseOperation()", "setCloseAction()", "exitOnClose()", "destroyWindow()"], answer: 0 },
+                { q: "11. ¿Para qué se utiliza la clase JPanel?", options: ["Para crear menús desplegables", "Como contenedor intermedio para agrupar otros componentes", "Para dibujar gráficos 3D directamente", "Para conectar con la red"], answer: 1 },
+                { q: "12. ¿Qué interfaz se suele implementar para responder a eventos de botón en Swing?", options: ["MouseListener", "ActionListener", "KeyListener", "WindowListener"], answer: 1 },
+                { q: "13. ¿Qué método de ActionListener se debe sobrescribir obligatoriamente?", options: ["buttonClicked()", "actionPerformed()", "onEvent()", "onClick()"], answer: 1 },
+                { q: "14. ¿Qué componente permite la selección de una opción desplegable en Swing?", options: ["JRadioButton", "JComboBox", "JCheckBox", "JSlider"], answer: 1 },
+                { q: "15. La integración final de un sistema GUI con POO requiere:", options: ["Separar la lógica de negocio de la interfaz gráfica", "Escribir todo dentro del método main", "Evitar el uso de clases", "Usar solo código ejecutable de consola"], answer: 0 }
+            ]
+        };
+
+        function renderAllForms() {
+            // Render Diagnósticos
+            for (let p = 1; p <= 3; p++) {
+                const container = document.getElementById(`diag${p}-questions`);
+                if (!container) continue;
+                container.innerHTML = '';
+
+                diagQuestionsData[p].forEach((qData, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let optionsHTML = '';
+                    qData.options.forEach((opt, optIdx) => {
+                        optionsHTML += `
+                            <label class="quiz-option">
+                                <input type="radio" name="d${p}_q${index}" value="${optIdx}">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${optionsHTML}</div>`;
+                    container.appendChild(qDiv);
+                });
+            }
+
+            // Render Exámenes
+            for (let p = 1; p <= 3; p++) {
+                const container = document.getElementById(`quiz${p}-questions`);
+                if (!container) continue;
+                container.innerHTML = '';
+
+                quizQuestionsData[p].forEach((qData, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let optionsHTML = '';
+                    qData.options.forEach((opt, optIdx) => {
+                        optionsHTML += `
+                            <label class="quiz-option">
+                                <input type="radio" name="p${p}_q${index}" value="${optIdx}">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${optionsHTML}</div>`;
+                    container.appendChild(qDiv);
+                });
+            }
+        }
+
+        function evaluateDiag(pNum) {
+            const data = diagQuestionsData[pNum];
+            let score = 0;
+            data.forEach((qData, index) => {
+                const selected = document.querySelector(`input[name="d${pNum}_q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qData.answer) {
+                    score++;
+                }
+            });
+
+            userData.diagScores[pNum] = score;
+
+            const resultBox = document.getElementById(`resultDiag${pNum}`);
+            resultBox.style.display = 'block';
+            const grade = ((score / data.length) * 10).toFixed(1);
+            resultBox.innerHTML = `
+                <h3>Resultados Diagnóstico Parcial ${pNum}: ${score} / ${data.length} (${grade}/10)</h3>
+                <p>Resultado guardado para medir tus conocimientos previos de este módulo.</p>
+            `;
+
+            updateReportTable();
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function evaluateQuiz(pNum) {
+            const data = quizQuestionsData[pNum];
+            let score = 0;
+            data.forEach((qData, index) => {
+                const selected = document.querySelector(`input[name="p${pNum}_q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qData.answer) {
+                    score++;
+                }
+            });
+
+            userData.quizScores[pNum] = score;
+
+            const resultBox = document.getElementById(`resultQuiz${pNum}`);
+            resultBox.style.display = 'block';
+            const grade = ((score / data.length) * 10).toFixed(1);
+            resultBox.innerHTML = `
+                <h3>Calificación Examen Parcial ${pNum}: ${score} / ${data.length} (${grade}/10)</h3>
+                <p>Examen sumativo registrado exitosamente.</p>
+            `;
+
+            updateReportTable();
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateReportTable() {
+            document.getElementById('repNombre').textContent = userData.nombre || 'No registrado';
+            document.getElementById('repMatricula').textContent = userData.matricula || 'N/A';
+            document.getElementById('repGrupo').textContent = userData.grupo || 'N/A';
+
+            const d = new Date();
+            document.getElementById('reportDate').textContent = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+
+            // Actualizar Diagnósticos
+            const d1 = userData.diagScores[1];
+            const d2 = userData.diagScores[2];
+            const d3 = userData.diagScores[3];
+
+            document.getElementById('repD1Score').textContent = `${d1} / 5`;
+            document.getElementById('repD2Score').textContent = `${d2} / 5`;
+            document.getElementById('repD3Score').textContent = `${d3} / 5`;
+
+            document.getElementById('repD1Grade').textContent = ((d1 / 5) * 10).toFixed(1);
+            document.getElementById('repD2Grade').textContent = ((d2 / 5) * 10).toFixed(1);
+            document.getElementById('repD3Grade').textContent = ((d3 / 5) * 10).toFixed(1);
+
+            // Actualizar Exámenes
+            const q1 = userData.quizScores[1];
+            const q2 = userData.quizScores[2];
+            const q3 = userData.quizScores[3];
+
+            document.getElementById('repP1Score').textContent = `${q1} / 15`;
+            document.getElementById('repP2Score').textContent = `${q2} / 15`;
+            document.getElementById('repP3Score').textContent = `${q3} / 15`;
+
+            const g1 = ((q1 / 15) * 10).toFixed(1);
+            const g2 = ((q2 / 15) * 10).toFixed(1);
+            const g3 = ((q3 / 15) * 10).toFixed(1);
+
+            document.getElementById('repP1Grade').textContent = g1;
+            document.getElementById('repP2Grade').textContent = g2;
+            document.getElementById('repP3Grade').textContent = g3;
+
+            const prom = ((parseFloat(g1) + parseFloat(g2) + parseFloat(g3)) / 3).toFixed(1);
+            document.getElementById('repPromedio').textContent = `${prom} / 10`;
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('reportPrintArea');
+            const opt = {
+                margin:       0.5,
+                filename:     `Reporte_Java_${userData.nombre.replace(/\s+/g, '_') || 'Alumno'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function playAudio(part) {
+            const output = document.getElementById('monkeyOutput');
+            output.textContent = `🔊 Playing Sound (English): "${part}"`;
+
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(part);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function switchParcial(id, btn) {
+            const contents = document.querySelectorAll('.parcial-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+
+            updateSidebar(id);
+        }
+
+        window.onload = function() {
+            renderAllForms();
+            updateSidebar('parcial1');
+        };
+    </script>
+</body>
+</html>
