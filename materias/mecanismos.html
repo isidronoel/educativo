@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mecanismos y Máquinas Compuestas | Plataforma Interactiva</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Librería MathJax para fórmulas matemáticas complejas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Librería html2pdf para descargar reporte en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-card-border: rgba(255, 255, 255, 0.1);
+            --primary: #0284c7;
+            --primary-light: #38bdf8;
+            --accent: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --code-bg: #050811;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        /* Modal de Login / Datos Alumno */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .modal-box h2 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--code-bg);
+            border: 1px solid var(--bg-card-border);
+            color: var(--text-main);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Header / Navbar */
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--bg-card-border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .user-badge {
+            font-size: 0.85rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 0.4rem;
+            overflow-x: auto;
+            max-width: 100%;
+            padding-bottom: 0.2rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--text-main);
+            background: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 12px rgba(2, 132, 199, 0.4);
+        }
+
+        .tab-btn.diag-btn {
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .tab-btn.diag-btn:hover {
+            background: rgba(251, 146, 60, 0.15);
+        }
+
+        .tab-btn.quiz-btn {
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .tab-btn.quiz-btn:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        /* Layout Main */
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 12px;
+            padding: 1rem;
+            height: fit-content;
+            position: sticky;
+            top: 5rem;
+            max-height: calc(100vh - 6rem);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 0.4rem;
+        }
+
+        .sidebar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Main Content */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .parcial-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .parcial-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards & Topic Sections */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .card h2 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .formula-box {
+            background: var(--code-bg);
+            border: 1px solid var(--primary-light);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .formula-title {
+            color: var(--accent-green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--accent-orange);
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .example-title {
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .analogy {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        .analogy strong {
+            color: var(--accent);
+        }
+
+        /* Canvas & Simulators */
+        .sim-container {
+            background: var(--code-bg);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        canvas {
+            background: #020617;
+            border: 1px solid var(--primary-light);
+            border-radius: 6px;
+            max-width: 100%;
+        }
+
+        .sim-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .sim-controls input[type="range"] {
+            accent-color: var(--accent);
+        }
+
+        /* Videos Section */
+        .video-box {
+            background: rgba(2, 132, 199, 0.1);
+            border: 1px solid var(--primary-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .video-icon {
+            font-size: 2rem;
+        }
+
+        .video-link {
+            color: var(--accent);
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .video-link:hover {
+            color: var(--primary-light);
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--bg-card-border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+        }
+
+        /* Quiz Styles */
+        .quiz-question {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .quiz-question p {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .quiz-option input[type="radio"] {
+            accent-color: var(--accent);
+        }
+
+        .quiz-result-box {
+            background: var(--code-bg);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Buttons & Utility */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-green {
+            background: #10b981;
+        }
+
+        .btn-green:hover {
+            background: #059669;
+        }
+
+        .report-card {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .report-card h2, .report-card h3 {
+            color: #0284c7;
+        }
+
+        .report-card table {
+            color: #0f172a;
+        }
+
+        .report-card th {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .report-card td, .report-card th {
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--bg-card-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #reportPrintArea, #reportPrintArea * {
+                visibility: visible;
+            }
+            #reportPrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                color: #000;
+                background: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Modal de Identificación (Actualizado: Solo Nombre) -->
+    <div id="userModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>⚙️ Registro de Alumno</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">
+                Ingresa tu nombre para acceder a la plataforma de Mecanismos.
+            </p>
+            <div class="input-group">
+                <label for="inputNombre">Nombre Completo:</label>
+                <input type="text" id="inputNombre" placeholder="Ej. Juan Pérez González" onkeyup="if(event.key === 'Enter') saveUserData()">
+            </div>
+            <button class="btn" style="width: 100%; margin-top: 0.5rem;" onclick="saveUserData()">Iniciar Plataforma</button>
+        </div>
+    </div>
+
+    <!-- Header / Nav -->
+    <header>
+        <div class="logo">
+            ⚙️ Mech<span>Academy</span>
+        </div>
+        <div id="userDisplay" class="user-badge">Alumno: No registrado</div>
+        <nav>
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag1', this)">🔍 Diag P1</button>
+            <button class="tab-btn active" onclick="switchParcial('parcial1', this)">Parcial 1</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz1', this)">📝 Examen P1</button>
+
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag2', this)">🔍 Diag P2</button>
+            <button class="tab-btn" onclick="switchParcial('parcial2', this)">Parcial 2</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz2', this)">📝 Examen P2</button>
+
+            <button class="tab-btn diag-btn" onclick="switchParcial('diag3', this)">🔍 Diag P3</button>
+            <button class="tab-btn" onclick="switchParcial('parcial3', this)">Parcial 3</button>
+            <button class="tab-btn quiz-btn" onclick="switchParcial('quiz3', this)">📝 Examen P3</button>
+
+            <button class="tab-btn" onclick="switchParcial('glosario', this)">📖 Glosario</button>
+            <button class="tab-btn" onclick="switchParcial('reporte', this)">📊 Reporte / PDF</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Dinámico -->
+        <aside class="sidebar">
+            <h3 id="sidebar-title">Temario Parcial 1</h3>
+            <ul id="sidebar-list"></ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 1 -->
+            <div id="diag1" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 1</h2>
+                    <p>Cuestionario previo sobre conceptos básicos de cinemática, máquinas simples y tipos de movimientos.</p>
+                </div>
+                <form id="formDiag1" class="card">
+                    <div id="diag1-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(1)">Calcular Diagnóstico Parcial 1</button>
+                    <div id="resultDiag1" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 1 -->
+            <div id="parcial1" class="parcial-content active">
+                <section id="p1-intro" class="card">
+                    <h2>1.1 Introducción e Historia de los Mecanismos</h2>
+                    <p>Un <strong>mecanismo</strong> es un conjunto de elementos rígidos interconectados entre sí mediante uniones móviles cuya función principal es transmitir y/o transformar fuerzas y movimientos desde un elemento motriz (entrada) hasta un elemento receptor (salida).</p>
+                    <div class="analogy">
+                        💡 <strong>Evolución Histórica:</strong> Desde las palancas y cuñas en el Antiguo Egipto para erigir pirámides, pasando por Arquímedes con el tornillo sinfín, hasta la Revolución Industrial con Watt y la máquina de vapor, los mecanismos han evolucionado para multiplicar la fuerza humana y automatizar el trabajo mecánico.
+                    </div>
+
+                    <div class="video-box">
+                        <div class="video-icon">📺</div>
+                        <div>
+                            <strong>Video Explicativo Recomendado:</strong>
+                            <p>Aprende la historia y conceptos fundamentales de los mecanismos en este tutorial explicativo:</p>
+                            <a class="video-link" href="https://www.youtube.com/results?search_query=introduccion+a+los+mecanismos+y+maquinas+simples" target="_blank">Ver Video: Introducción a los Mecanismos y Máquinas (YouTube)</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="p1-maquinas" class="card">
+                    <h2>1.2 Máquinas Compuestas y Operadores</h2>
+                    <p>Una <strong>máquina compuesta</strong> es una combinación de dos o más máquinas simples u operadores mecánicos interconectados que trabajan en serie o paralelo para realizar un trabajo complejo.</p>
+                    <ul>
+                        <li><strong>Estructura (Bastidor):</strong> Soporta el peso y absorbe las reacciones de fuerza.</li>
+                        <li><strong>Motor / Elemento Motriz:</strong> Suministra la energía mecánica de entrada (ej. motor eléctrico, manivela).</li>
+                        <li><strong>Mecanismo Transmisor / Transformador:</strong> Modifica la velocidad, el torque o el tipo de movimiento.</li>
+                        <li><strong>Receptor / Elemento Conducido:</strong> Realiza el trabajo final (ej. rueda, herramienta de corte).</li>
+                    </ul>
+                </section>
+
+                <section id="p1-tipos-mov" class="card">
+                    <h2>1.3 Tipos de Movimientos en las Máquinas</h2>
+                    <p>En el análisis cinemático de mecanismos, distinguimos cuatro tipos fundamentales de movimiento:</p>
+                    <ul>
+                        <li><strong>Giratorio / Rotativo:</strong> Movimiento continuo alrededor de un eje fijo (ej. un eje de motor). Se mide en velocidad angular \(\omega\) o revoluciones por minuto (\(N\)).</li>
+                        <li><strong>Circular (Oscilante):</strong> Giro que no completa los \(360^\circ\), sino que oscila en un arco (ej. un péndulo o limpiaparabrisas).</li>
+                        <li><strong>Lineal Continuo:</strong> Desplazamiento rectilíneo en un solo sentido constante (ej. una cinta transportadora).</li>
+                        <li><strong>Lineal Alternativo (Alternativo/Alternante):</strong> Desplazamiento rectilíneo de ida y vuelta constante (ej. el pistón de un motor de combustión).</li>
+                    </ul>
+                </section>
+
+                <section id="p1-transmision-lineal" class="card">
+                    <h2>Mecanismos de Transmisión Lineal: Poleas</h2>
+                    <p>Transmiten fuerza y movimiento lineal modificando la dirección de tirón o multiplicando la fuerza ejercida.</p>
+                    
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Fórmula de Transmisión Ideal en Poleas</div>
+                        <p><strong>Fórmula:</strong> \[ F \cdot d_F = R \cdot d_R \quad \text{o bien Ventaja Mecánica } VM = \frac{R}{F} \]</p>
+                        <p><strong>Casos que resuelve:</strong> Permite calcular la fuerza de entrada (\(F\)) requerida para levantar una carga (\(R\)), la distancia recorrida o la ventaja mecánica ejercida.</p>
+                    </div>
+
+                    <div class="video-box">
+                        <div class="video-icon">📺</div>
+                        <div>
+                            <strong>Video Explicativo de Poleas:</strong>
+                            <p>Explicación sencilla sobre polipastos factoriales y ventaja mecánica:</p>
+                            <a class="video-link" href="https://www.youtube.com/results?search_query=poleas+fijas+moviles+y+polipastos+explicacion" target="_blank">Ver Video: Polipastos y Ventaja Mecánica (YouTube)</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="p1-transmision-circular" class="card">
+                    <h2>Mecanismos de Transmisión Circular</h2>
+                    <p>Transmiten movimiento rotativo entre dos o más ejes. Incluyen poleas de transmisión, ruedas de fricción, polea-cadena, engranajes y tornillo sinfín-corona.</p>
+                    
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Ley Fundamental de la Transmisión Circular</div>
+                        <p><strong>Fórmula:</strong> \[ N_1 \cdot D_1 = N_2 \cdot D_2 \quad \text{o en engranajes: } N_1 \cdot Z_1 = N_2 \cdot Z_2 \]</p>
+                        <p><strong>Relación de Transmisión (\(i\)):</strong> \[ i = \frac{N_2}{N_1} = \frac{D_1}{D_2} = \frac{Z_1}{Z_2} \]</p>
+                        <p><strong>Casos que resuelve:</strong> Calcula la velocidad de salida (\(N_2\)), el diámetro (\(D_2\)) o número de dientes (\(Z_2\)) necesarios para obtener una velocidad específica.</p>
+                    </div>
+
+                    <!-- SIMULADOR POLEAS DE TRANSMISIÓN -->
+                    <div class="sim-container">
+                        <h3 style="color: var(--accent);">🕹️ Simulador Gráfico Interactivo: Poleas de Transmisión</h3>
+                        <canvas id="canvasPoleas" width="450" height="200"></canvas>
+                        <div class="sim-controls">
+                            <label>Diámetro Polea Motriz \(D_1\): <span id="valD1">20</span> cm</label>
+                            <input type="range" id="sliderD1" min="10" max="40" value="20" oninput="drawPoleas()">
+                            <label>Diámetro Polea Conducida \(D_2\): <span id="valD2">40</span> cm</label>
+                            <input type="range" id="sliderD2" min="10" max="40" value="40" oninput="drawPoleas()">
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--accent-green);">
+                            Velocidad Motor (\(N_1\)): 1200 rpm | Velocidad Salida calculada (\(N_2\)): <strong id="simN2">600</strong> rpm
+                        </div>
+                    </div>
+                </section>
+
+                <section id="p1-biela-manivela" class="card">
+                    <h2>Mecanismo Biela-Manivela y Biela-Manivela-Émbolo</h2>
+                    <p>Transforma un movimiento giratorio continuo en un movimiento lineal alternativo o viceversa.</p>
+                    <ul>
+                        <li><strong>Manivela:</strong> Elemento giratorio acoplado a un eje con un radio \(r\).</li>
+                        <li><strong>Biela:</strong> Barra rígida unida articuladamente por sus extremos a la manivela y al émbolo.</li>
+                        <li><strong>Émbolo / Pistón:</strong> Pieza que realiza el desplazamiento lineal alternativo guiado.</li>
+                    </ul>
+
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Carrera del Émbolo</div>
+                        <p><strong>Fórmula de Carrera Total (\(C\)):</strong> \[ C = 2 \cdot r \]</p>
+                    </div>
+
+                    <!-- SIMULADOR BIELA MANIVELA -->
+                    <div class="sim-container">
+                        <h3 style="color: var(--accent);">🕹️ Simulador Gráfico Interactivo: Biela-Manivela-Pistón</h3>
+                        <canvas id="canvasBiela" width="450" height="180"></canvas>
+                        <div class="sim-controls">
+                            <label>Radio Manivela (\(r\)): <span id="valR">30</span> mm</label>
+                            <input type="range" id="sliderR" min="15" max="45" value="30">
+                            <button class="btn" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;" onclick="toggleBielaSim()">Pausar/Reanudar</button>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--accent-orange);">
+                            Carrera Total Calculada (\(C = 2r\)): <strong id="simCarrera">60</strong> mm
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN DE PROBLEMAS Y SOLUCIONES PARCIAL 1 -->
+                <section id="p1-problemas" class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h2>🧮 Sección de Problemas Resueltos Paso a Paso (Parcial 1)</h2>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 1: Aparejo Factorial</div>
+                        <p><strong>Enunciado:</strong> Se requiere elevar una carga de masa \(m = 400\text{ kg}\) (\(g \approx 9.8\text{ m/s}^2\)) utilizando un polipasto factorial que cuenta con 4 poleas móviles (\(n=4\)). ¿Qué fuerza \(F\) se debe ejercer para levantarla en equilibrio?</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Calculamos la Resistencia o Carga (\(R\)): \[ R = m \cdot g = 400\text{ kg} \cdot 9.8\text{ m/s}^2 = 3920\text{ N} \]</p>
+                        <p>2. Aplicamos la fórmula para polipasto factorial: \[ F = \frac{R}{2 \cdot n} \]</p>
+                        <p>3. Sustituyendo valores: \[ F = \frac{3920\text{ N}}{2 \cdot 4} = \frac{3920}{8} = 490\text{ N} \]</p>
+                        <p><strong>Resultado:</strong> Se necesita aplicar una fuerza de **490 N**.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 2: Transmisión por Correa y Poleas</div>
+                        <p><strong>Enunciado:</strong> Un motor girando a \(N_1 = 1500\text{ rpm}\) dispone de una polea en su eje de \(D_1 = 12\text{ cm}\). Se desea accionar un ventilador a una velocidad reducida de \(N_2 = 300\text{ rpm}\). Determina el diámetro \(D_2\) que debe tener la polea del ventilador.</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Ecuación fundamental: \[ N_1 \cdot D_1 = N_2 \cdot D_2 \]</p>
+                        <p>2. Despejamos el diámetro de salida (\(D_2\)): \[ D_2 = \frac{N_1 \cdot D_1}{N_2} \]</p>
+                        <p>3. Sustituyendo valores: \[ D_2 = \frac{1500\text{ rpm} \cdot 12\text{ cm}}{300\text{ rpm}} = \frac{18000}{300} = 60\text{ cm} \]</p>
+                        <p><strong>Resultado:</strong> La polea conducida debe medir **60 cm** de diámetro.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 3: Desplazamiento en Sistema Biela-Manivela</div>
+                        <p><strong>Enunciado:</strong> En un motor monocilíndrico, la manivela tiene un radio de \(r = 50\text{ mm}\) y la biela mide \(L = 150\text{ mm}\). Calcula la carrera total del pistón y la distancia desde el eje del cigüeñal hasta el perno del pistón en el Punto Muerto Superior (PMS).</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Carrera total del pistón (\(C\)): \[ C = 2 \cdot r = 2 \cdot 50\text{ mm} = 100\text{ mm} \]</p>
+                        <p>2. En el PMS, la biela y la manivela están totalmente extendidas en línea recta (\(\theta = 0^\circ\)): \[ d_{\text{PMS}} = L + r = 150\text{ mm} + 50\text{ mm} = 200\text{ mm} \]</p>
+                        <p><strong>Resultado:</strong> La carrera es de **100 mm** y la distancia total en el PMS es de **200 mm**.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 1 -->
+            <div id="quiz1" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 1 (15 Preguntas)</h2>
+                    <p>Evaluación sumativa de fin de módulo sobre todos los contenidos revisados en el Parcial 1.</p>
+                </div>
+                <form id="formQuiz1" class="card">
+                    <div id="quiz1-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(1)">Calcular Examen Parcial 1</button>
+                    <div id="resultQuiz1" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 2 -->
+            <div id="diag2" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 2</h2>
+                    <p>Cuestionario previo para medir conocimientos de piñón-cremallera, transmisiones por cadena, trenes de engranajes y poleas.</p>
+                </div>
+                <form id="formDiag2" class="card">
+                    <div id="diag2-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(2)">Calcular Diagnóstico Parcial 2</button>
+                    <div id="resultDiag2" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 2 DETALLADO -->
+            <div id="parcial2" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent);">
+                    <h1 style="color: var(--accent); font-size: 1.6rem;">Parcial 2 – Tipos de Mecanismos, Engranes y Poleas</h1>
+                    <p>Estudio detallado de la transformación y transmisión de movimientos con piñón-cremallera, cadenas, tornillo sinfín, trenes de engranajes y sistemas avanzados de poleas.</p>
+                </div>
+
+                <section id="p2-pinon-cremallera" class="card">
+                    <h2>1.1 Mecanismo Piñón-Cremallera</h2>
+                    <p>Transforma un movimiento giratorio continuo (piñón) en un movimiento lineal continuo o alternativo (cremallera) y viceversa.</p>
+
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Avance Lineal por Vuelta del Piñón</div>
+                        <p><strong>Fórmula:</strong> \[ L = \pi \cdot D_p = p \cdot Z_p \]</p>
+                        <p><strong>Velocidad Lineal (\(v\)):</strong> \[ v = \frac{N \cdot p \cdot Z_p}{60} \]</p>
+                    </div>
+
+                    <div class="video-box">
+                        <div class="video-icon">📺</div>
+                        <div>
+                            <strong>Video Explicativo Piñón-Cremallera:</strong>
+                            <p>Visualiza el funcionamiento mecánico y aplicaciones del piñón y cremallera:</p>
+                            <a class="video-link" href="https://www.youtube.com/results?search_query=mecanismo+pinon+cremallera+explicacion" target="_blank">Ver Video: Mecanismo Piñón Cremallera (YouTube)</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="p2-cadena-pinon" class="card">
+                    <h2>1.2 Mecanismo Cadena-Piñón y Piñón-Sinfín</h2>
+                    <p><strong>Cadena-Piñón:</strong> Transmisión circular entre ejes distantes sin deslizamiento.</p>
+                    <p><strong>1.3 Mecanismo Piñón-Sinfín (Tornillo Sinfín - Corona):</strong> Transmisión entre ejes perpendiculares que se cruzan.</p>
+                    
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Relación de Transmisión del Tornillo Sinfín</div>
+                        <p><strong>Fórmula:</strong> \[ i = \frac{N_2}{N_1} = \frac{Z_e}{Z_c} \]</p>
+                    </div>
+                </section>
+
+                <section id="p2-engranes" class="card">
+                    <h2>Tema 2: Engranes y Trenes de Engranajes</h2>
+                    <p>Los engranajes transmiten potencia mediante contacto directo entre sus dientes.</p>
+
+                    <!-- SIMULADOR DE ENGRANAJES -->
+                    <div class="sim-container">
+                        <h3 style="color: var(--accent);">🕹️ Simulador Gráfico Interactivo: Par de Engranajes</h3>
+                        <canvas id="canvasEngranes" width="450" height="200"></canvas>
+                        <div class="sim-controls">
+                            <label>Dientes Rueda Motriz (\(Z_1\)): <span id="valZ1">12</span></label>
+                            <input type="range" id="sliderZ1" min="8" max="24" value="12" oninput="drawEngranes()">
+                            <label>Dientes Rueda Conducida (\(Z_2\)): <span id="valZ2">24</span></label>
+                            <input type="range" id="sliderZ2" min="8" max="36" value="24" oninput="drawEngranes()">
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--accent-green);">
+                            Relación de Transmisión (\(i = Z_1/Z_2\)): <strong id="simI">0.50</strong> | Sentido: <strong>Invertido</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="p2-poleas" class="card">
+                    <h2>Tema 3: Poleas Fijas, Móviles y Multiplicadoras</h2>
+                    <p>Sistemas combinados para modificar fuerzas y direcciones de tiro.</p>
+                </section>
+
+                <!-- SECCIÓN DE PROBLEMAS Y SOLUCIONES PARCIAL 2 -->
+                <section id="p2-problemas" class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h2>🧮 Sección de Problemas Resueltos Paso a Paso (Parcial 2)</h2>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 1: Avance de Cremallera en Portón Automático</div>
+                        <p><strong>Enunciado:</strong> Un motor para abrir un portón automático utiliza un piñón de \(Z = 24\text{ dientes}\) con un paso interdental de \(p = 8\text{ mm}\). Si el motor gira a una velocidad de \(N = 90\text{ rpm}\), calcula la velocidad lineal de apertura del portón en metros por segundo (\(\text{m/s}\)).</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Calculamos el avance por vuelta (\(L\)): \[ L = p \cdot Z = 8\text{ mm} \cdot 24 = 192\text{ mm/vuelta} = 0.192\text{ m/vuelta} \]</p>
+                        <p>2. Calculamos las vueltas por segundo: \[ \text{RPS} = \frac{N}{60} = \frac{90}{60} = 1.5\text{ rev/s} \]</p>
+                        <p>3. Velocidad lineal (\(v\)): \[ v = 0.192\text{ m/vuelta} \cdot 1.5\text{ vueltas/s} = 0.288\text{ m/s} \]</p>
+                        <p><strong>Resultado:</strong> El portón se abre a una velocidad constante de **0.288 m/s**.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 2: Reducción por Tornillo Sinfín</div>
+                        <p><strong>Enunciado:</strong> Se conecta un motor eléctrico de \(N_1 = 3600\text{ rpm}\) a un reductor de tornillo sinfín de doble entrada (\(Z_e = 2\)). La corona acoplada posee \(Z_c = 80\text{ dientes}\). Halla la velocidad de salida de la corona y la relación de reducción.</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Relación de transmisión (\(i\)): \[ i = \frac{Z_e}{Z_c} = \frac{2}{80} = \frac{1}{40} = 0.025 \]</p>
+                        <p>2. Velocidad de la corona (\(N_2\)): \[ N_2 = N_1 \cdot i = 3600\text{ rpm} \cdot \frac{1}{40} = 90\text{ rpm} \]</p>
+                        <p><strong>Resultado:</strong> La velocidad se reduce a **90 rpm** con una reducción de **1:40**.</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 3: Tren de Engranajes Compuesto</div>
+                        <p><strong>Enunciado:</strong> Un tren compuesto tiene un eje de entrada con engranaje \(Z_1 = 16\text{ t}\) que engrana con \(Z_2 = 48\text{ t}\). En el mismo eje de \(Z_2\) se monta un engranaje \(Z_3 = 20\text{ t}\) que impulsa a la rueda de salida \(Z_4 = 60\text{ t}\). Si la velocidad de entrada es \(N_1 = 1800\text{ rpm}\), calcula la velocidad de salida \(N_4\).</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Identificamos conductoras (\(Z_1, Z_3\)) y conducidas (\(Z_2, Z_4\)).</p>
+                        <p>2. Aplicamos la fórmula: \[ N_4 = N_1 \cdot \frac{Z_1 \cdot Z_3}{Z_2 \cdot Z_4} \]</p>
+                        <p>3. Sustituyendo valores: \[ N_4 = 1800 \cdot \frac{16 \cdot 20}{48 \cdot 60} = 1800 \cdot \frac{320}{2880} = 1800 \cdot \frac{1}{9} = 200\text{ rpm} \]</p>
+                        <p><strong>Resultado:</strong> La velocidad de salida en el eje final es de **200 rpm**.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 2 -->
+            <div id="quiz2" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 2 (15 Preguntas)</h2>
+                    <p>Examen sumativo de cierre sobre engranajes, piñón-cremallera, poleas y sistemas combinados.</p>
+                </div>
+                <form id="formQuiz2" class="card">
+                    <div id="quiz2-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(2)">Calcular Examen Parcial 2</button>
+                    <div id="resultQuiz2" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- EVALUACIÓN DIAGNÓSTICA PARCIAL 3 -->
+            <div id="diag3" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-orange);">
+                    <h2>🔍 Evaluación Diagnóstica - Parcial 3</h2>
+                    <p>Cuestionario previo de entrada para evaluar nociones de Grados de Libertad y Palancas.</p>
+                </div>
+                <form id="formDiag3" class="card">
+                    <div id="diag3-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateDiag(3)">Calcular Diagnóstico Parcial 3</button>
+                    <div id="resultDiag3" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- PARCIAL 3 DETALLADO -->
+            <div id="parcial3" class="parcial-content">
+                <div class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h1 style="color: var(--accent-green); font-size: 1.6rem;">Parcial 3 – Grados de Libertad y La Palanca</h1>
+                    <p>Análisis de la movilidad cinemática de mecanismos mediante el Criterio de Grübler-Kutzbach y estudio detallado de la Ley de la Palanca.</p>
+                </div>
+
+                <section id="p3-grados-libertad" class="card">
+                    <h2>Tema 1: Grados de Libertad (Mobility)</h2>
+                    <p>Los <strong>Grados de Libertad (GDL)</strong> representan el número de parámetros de entrada independientes requeridos para posicionar un mecanismo.</p>
+
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Criterio de Grübler-Kutzbach</div>
+                        <p>\[ M = 3 \cdot (n - 1) - 2 \cdot j_1 - j_2 \]</p>
+                    </div>
+
+                    <div class="video-box">
+                        <div class="video-icon">📺</div>
+                        <div>
+                            <strong>Video Explicativo Grados de Libertad:</strong>
+                            <p>Aprende a aplicar la fórmula de Grübler-Kutzbach paso a paso:</p>
+                            <a class="video-link" href="https://www.youtube.com/results?search_query=grados+de+libertad+mecanismos+grubler" target="_blank">Ver Video: Grados de Libertad y Criterio de Grübler (YouTube)</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="p3-palanca" class="card">
+                    <h2>Tema 4: La Palanca y Ley de la Palanca</h2>
+                    <p>La palanca es una máquina simple rígida que gira alrededor de un punto de apoyo o pivote (Fulcro).</p>
+
+                    <div class="formula-box">
+                        <div class="formula-title">📐 Ley Fundamental de la Palanca</div>
+                        <p>\[ P \cdot b_p = R \cdot b_r \]</p>
+                    </div>
+
+                    <!-- SIMULADOR DE PALANCAS -->
+                    <div class="sim-container">
+                        <h3 style="color: var(--accent);">🕹️ Simulador Gráfico Interactivo: Ley de la Palanca</h3>
+                        <canvas id="canvasPalanca" width="450" height="180"></canvas>
+                        <div class="sim-controls">
+                            <label>Posición Fulcro (\(b_p / b_r\)):</label>
+                            <input type="range" id="sliderFulcro" min="100" max="350" value="225" oninput="drawPalanca()">
+                            <label>Carga Resistencia (\(R\)): <span id="valRSim">600</span> N</label>
+                            <input type="range" id="sliderRSim" min="200" max="1000" value="600" step="50" oninput="drawPalanca()">
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--accent-orange);">
+                            Fuerza Potencia Requerida (\(P\)): <strong id="simFuerzaP">600</strong> N | Ventaja Mecánica (\(VM\)): <strong id="simVM">1.0</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN DE PROBLEMAS Y SOLUCIONES PARCIAL 3 -->
+                <section id="p3-problemas" class="card" style="border-left: 4px solid var(--accent-green);">
+                    <h2>🧮 Sección de Problemas Resueltos Paso a Paso (Parcial 3)</h2>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 1: Grados de Libertad en Mecanismo de Leva-Seguidor</div>
+                        <p><strong>Enunciado:</strong> Un mecanismo consta de un bastidor fijo, una leva rotativa (\(n_2\)) y un seguidor de rodillo (\(n_3\)). En total hay \(n = 3\) eslabones, 2 articulaciones de revolución o traslación (\(j_1 = 2\)) y 1 contacto de rodadura/deslizamiento entre leva y rodillo (\(j_2 = 1\)). Calcula la movilidad \(M\).</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Aplicamos la ecuación de Grübler-Kutzbach: \[ M = 3 \cdot (n - 1) - 2 \cdot j_1 - j_2 \]</p>
+                        <p>2. Sustituyendo valores (\(n=3, j_1=2, j_2=1\)): \[ M = 3 \cdot (3 - 1) - 2 \cdot (2) - 1 = 3 \cdot (2) - 4 - 1 = 6 - 5 = 1 \]</p>
+                        <p><strong>Resultado:</strong> El mecanismo tiene **1 Grado de Libertad** (\(M=1\)).</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 2: Palanca de Primer Grado (Alicate)</div>
+                        <p><strong>Enunciado:</strong> Un alicate funciona como una palanca doble de primer grado. Si la distancia del eje a los mangos donde se aprieta la mano es \(b_p = 18\text{ cm}\) y la distancia del eje a la zona de corte es \(b_r = 3\text{ cm}\), calcula la fuerza de corte ejercida sobre un cable si la mano aplica una fuerza de \(P = 150\text{ N}\).</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Aplicamos la Ley de la Palanca: \[ P \cdot b_p = R \cdot b_r \]</p>
+                        <p>2. Despejamos la fuerza de resistencia de corte (\(R\)): \[ R = \frac{P \cdot b_p}{b_r} \]</p>
+                        <p>3. Sustitución: \[ R = \frac{150\text{ N} \cdot 18\text{ cm}}{3\text{ cm}} = 150 \cdot 6 = 900\text{ N} \]</p>
+                        <p><strong>Resultado:</strong> La fuerza ejercida para cortar el cable es de **900 N** (Ventaja Mecánica \(VM = 6\)).</p>
+                    </div>
+
+                    <div class="example-box">
+                        <div class="example-title">Problema 3: Palanca de Segundo Grado (Carretilla)</div>
+                        <p><strong>Enunciado:</strong> Una carretilla de mano tiene su eje de rueda en un extremo. Se carga con tierra situando el centro de gravedad a \(b_r = 0.4\text{ m}\) de la rueda, ejerciendo un peso de carga \(R = 800\text{ N}\). Los mangos están a una distancia total de \(b_p = 1.6\text{ m}\) del eje de la rueda. ¿Qué fuerza vertical \(P\) debe hacer el operario para levantarla?</p>
+                        <p><strong>Solución Paso a Paso:</strong></p>
+                        <p>1. Despejamos Potencia (\(P\)): \[ P = \frac{R \cdot b_r}{b_p} \]</p>
+                        <p>2. Sustitución: \[ P = \frac{800\text{ N} \cdot 0.4\text{ m}}{1.6\text{ m}} = \frac{320}{1.6} = 200\text{ N} \]</p>
+                        <p><strong>Resultado:</strong> El operario solo necesita aplicar **200 N** de fuerza muscular.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- EXAMEN FINAL PARCIAL 3 -->
+            <div id="quiz3" class="parcial-content">
+                <div class="card">
+                    <h2>📝 Examen Final - Parcial 3 (15 Preguntas)</h2>
+                    <p>Examen sumativo final sobre Grados de Libertad, Grübler-Kutzbach y Ley de la Palanca.</p>
+                </div>
+                <form id="formQuiz3" class="card">
+                    <div id="quiz3-questions"></div>
+                    <button type="button" class="btn" onclick="evaluateQuiz(3)">Calcular Examen Parcial 3</button>
+                    <div id="resultQuiz3" class="quiz-result-box"></div>
+                </form>
+            </div>
+
+            <!-- GLOSARIO DE TÉRMINOS -->
+            <div id="glosario" class="parcial-content">
+                <section class="card">
+                    <h2>📖 Glosario de Términos de Mecanismos y Máquinas</h2>
+                    <p>Consulta rápida de definiciones y conceptos técnicos:</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Término</th>
+                                    <th>Concepto y Significado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Mecanismo</strong></td>
+                                    <td>Conjunto de elementos rígidos combinados para transmitir o transformar fuerza y movimiento.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grados de Libertad (GDL)</strong></td>
+                                    <td>Número de movilidad de parámetros independientes requeridos para posicionar un mecanismo.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Relación de Transmisión (\(i\))</strong></td>
+                                    <td>Cociente entre la velocidad de salida y la velocidad de entrada del sistema.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ventaja Mecánica (\(VM\))</strong></td>
+                                    <td>Relación entre la fuerza de resistencia obtenida y la fuerza de potencia aplicada.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Punto Muerto</strong></td>
+                                    <td>Posición cinemática donde la alineación de componentes impide la transmisión de torque.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tornillo Sinfín</strong></td>
+                                    <td>Mecanismo de transmisión reductor e irreversible formado por un tornillo helicoidal y una corona.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Paso Diente (\(p\))</strong></td>
+                                    <td>Distancia entre dos puntos homólogos consecutivos de dos dientes adyacentes.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fulcro</strong></td>
+                                    <td>Punto pivote o eje rígido de apoyo sobre el cual oscila una palanca.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Polipasto</strong></td>
+                                    <td>Combinación de poleas fijas y móviles utilizadas para elevar grandes cargas con menor esfuerzo.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Émbolo / Pistón</strong></td>
+                                    <td>Componente con movimiento lineal alternativo guiado dentro de un cilindro.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- REPORTE DE EXÁMENES Y PDF -->
+            <div id="reporte" class="parcial-content">
+                <div class="card">
+                    <h2>📊 Reporte Académico de Evaluaciones</h2>
+                    <p>Resultados detallados diferenciados entre Evaluaciones Diagnósticas y Exámenes Parciales.</p>
+                    <div class="btn-group" style="margin-top: 1rem;">
+                        <button class="btn" onclick="window.print()">🖨️ Imprimir Reporte</button>
+                        <button class="btn btn-green" onclick="generatePDF()">📄 Descargar Reporte PDF</button>
+                    </div>
+                </div>
+
+                <div id="reportPrintArea" class="report-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <h2 style="margin:0;">⚙️ MechAcademy - Reporte Oficial</h2>
+                            <p style="margin:0; font-size: 0.9rem; color: #475569;">Plataforma Académica de Evaluaciones Diagnósticas y Sumativas de Mecanismos</p>
+                        </div>
+                        <div style="text-align: right; font-size: 0.85rem; color: #64748b;">
+                            Fecha: <span id="reportDate">--/--/----</span>
+                        </div>
+                    </div>
+
+                    <h3>📌 Información del Estudiante</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <tr>
+                                <td><strong>Nombre Alumno:</strong></td>
+                                <td id="repNombre">No registrado</td>
+                                <td><strong>Estatus:</strong></td>
+                                <td>Activo</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>🔍 Evaluaciones Diagnósticas (Entrada)</h3>
+                    <div class="table-responsive" style="margin-bottom: 1.5rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Módulo</th>
+                                    <th>Aciertos</th>
+                                    <th>Diagnóstico (Base 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Diagnóstica Parcial 1</td>
+                                    <td id="repD1Score">0 / 5</td>
+                                    <td id="repD1Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnóstica Parcial 2</td>
+                                    <td id="repD2Score">0 / 5</td>
+                                    <td id="repD2Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Diagnóstica Parcial 3</td>
+                                    <td id="repD3Score">0 / 5</td>
+                                    <td id="repD3Grade">0.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>📝 Exámenes Sumativos por Parcial (Cierre)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Evaluación</th>
+                                    <th>Aciertos</th>
+                                    <th>Calificación (Base 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Examen Parcial 1: Intro y Transmisión Básica</td>
+                                    <td id="repP1Score">0 / 15</td>
+                                    <td id="repP1Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Examen Parcial 2: Engranes, Cremallera y Poleas</td>
+                                    <td id="repP2Score">0 / 15</td>
+                                    <td id="repP2Grade">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td>Examen Parcial 3: Grados de Libertad y Palancas</td>
+                                    <td id="repP3Score">0 / 15</td>
+                                    <td id="repP3Grade">0.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 2px solid #0284c7; padding: 1.2rem; border-radius: 8px; margin-top: 1.5rem; text-align: center;">
+                        <h3 style="margin: 0; color: #0f172a;">PROMEDIO GENERAL DE EXÁMENES</h3>
+                        <p id="repPromedio" style="font-size: 2rem; font-weight: bold; color: #0284c7; margin: 0.5rem 0 0 0;">0.0 / 10</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Mecanismos y Máquinas Compuestas &copy; 2026 - Plataforma de Aprendizaje Interactivo</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        // Datos del Alumno y Puntuaciones
+        const userData = {
+            nombre: '',
+            diagScores: { 1: 0, 2: 0, 3: 0 },
+            quizScores: { 1: 0, 2: 0, 3: 0 }
+        };
+
+        function saveUserData() {
+            const nomInput = document.getElementById('inputNombre');
+            const nom = nomInput ? nomInput.value.trim() : '';
+
+            userData.nombre = nom || 'Alumno Conectado';
+
+            document.getElementById('userDisplay').textContent = `Alumno: ${userData.nombre}`;
+            document.getElementById('userModal').style.display = 'none';
+
+            updateReportTable();
+        }
+
+        // Sidebar Dinámica
+        const sidebarContents = {
+            diag1: { title: "Diag P1", items: [{ name: "Cuestionario Entrada P1", link: "#formDiag1" }] },
+            parcial1: {
+                title: "Temario Parcial 1",
+                items: [
+                    { name: "1.1 Historia de Mecanismos", link: "#p1-intro" },
+                    { name: "1.2 Máquinas Compuestas", link: "#p1-maquinas" },
+                    { name: "1.3 Tipos de Movimiento", link: "#p1-tipos-mov" },
+                    { name: "Transmisión Lineal: Poleas", link: "#p1-transmision-lineal" },
+                    { name: "Transmisión Circular", link: "#p1-transmision-circular" },
+                    { name: "Biela-Manivela-Émbolo", link: "#p1-biela-manivela" },
+                    { name: "🧮 Problemas Resueltos", link: "#p1-problemas" }
+                ]
+            },
+            quiz1: { title: "Examen P1", items: [{ name: "Ir al Examen P1", link: "#formQuiz1" }] },
+            
+            diag2: { title: "Diag P2", items: [{ name: "Cuestionario Entrada P2", link: "#formDiag2" }] },
+            parcial2: {
+                title: "Temario Parcial 2",
+                items: [
+                    { name: "1.1 Piñón-Cremallera", link: "#p2-pinon-cremallera" },
+                    { name: "1.2 Cadena-Piñón y Sinfín", link: "#p2-cadena-pinon" },
+                    { name: "Tema 2: Engranes y Trenes", link: "#p2-engranes" },
+                    { name: "Tema 3: Poleas Fijas/Móviles", link: "#p2-poleas" },
+                    { name: "🧮 Problemas Resueltos", link: "#p2-problemas" }
+                ]
+            },
+            quiz2: { title: "Examen P2", items: [{ name: "Ir al Examen P2", link: "#formQuiz2" }] },
+
+            diag3: { title: "Diag P3", items: [{ name: "Cuestionario Entrada P3", link: "#formDiag3" }] },
+            parcial3: {
+                title: "Temario Parcial 3",
+                items: [
+                    { name: "1. Grados de Libertad", link: "#p3-grados-libertad" },
+                    { name: "4. La Palanca y sus Grados", link: "#p3-palanca" },
+                    { name: "🧮 Problemas Resueltos", link: "#p3-problemas" }
+                ]
+            },
+            quiz3: { title: "Examen P3", items: [{ name: "Ir al Examen P3", link: "#formQuiz3" }] },
+
+            glosario: { title: "Glosario", items: [{ name: "Conceptos Clave", link: "#glosario" }] },
+            reporte: { title: "Reportes", items: [{ name: "Resultados & PDF", link: "#reporte" }] }
+        };
+
+        function updateSidebar(tabId) {
+            const sidebarTitle = document.getElementById('sidebar-title');
+            const sidebarList = document.getElementById('sidebar-list');
+            const data = sidebarContents[tabId];
+
+            if (data && sidebarTitle && sidebarList) {
+                sidebarTitle.textContent = data.title;
+                sidebarList.innerHTML = '';
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${item.link}">${item.name}</a>`;
+                    sidebarList.appendChild(li);
+                });
+            }
+        }
+
+        // Banco de Diagnósticos
+        const diagQuestionsData = {
+            1: [
+                { q: "1. ¿Cuál es la función principal de un mecanismo?", options: ["Generar energía eléctrica desde cero", "Transmitir o transformar fuerzas y movimientos", "Aumentar el peso de una máquina", "Almacenar combustible"], answer: 1 },
+                { q: "2. El movimiento de un pistón dentro de un cilindro es de tipo:", options: ["Giratorio continuo", "Circular oscilante", "Lineal alternativo", "Rotativo angular"], answer: 2 },
+                { q: "3. Una polea fija se caracteriza cinemáticamente por:", options: ["Reducir la fuerza requerida a la mitad", "Cambiar la dirección de la fuerza sin cambiar su magnitud", "Multiplicar por 4 la ventaja mecánica", "Girar únicamente hacia la izquierda"], answer: 1 },
+                { q: "4. Si la rueda conducida es menor que la rueda motriz en un sistema circular, el sistema es:", options: ["Reductor de velocidad", "Multiplicador de velocidad", "Inversor de marcha estático", "Bloqueado"], answer: 1 },
+                { q: "5. ¿Qué ocurre en un punto muerto del mecanismo biela-manivela?", options: ["Se alcanza la máxima velocidad angular", "La biela y manivela quedan alineadas y no se genera torque", "El motor se destruye", "El émbolo gira 360 grados"], answer: 1 }
+            ],
+            2: [
+                { q: "1. El mecanismo piñón-cremallera transforma movimiento:", options: ["Giratorio en lineal (o viceversa)", "Giratorio en circular oscilante únicamente", "Lineal continuo en lineal alternativo", "Angular en vectorial"], answer: 0 },
+                { q: "2. Una ventaja clave de la transmisión por cadena respecto a la correa es:", options: ["No requiere lubricación jamás", "Ausencia total de deslizamiento", "Es totalmente silenciosa a alta velocidad", "No usa dientes"], answer: 1 },
+                { q: "3. El mecanismo tornillo sinfín-corona destaca por ser:", options: ["Un multiplicador de velocidad", "Irreversible (la corona no puede mover al sinfín)", "Un mecanismo de transmisión lineal directa", "Capaz de girar solo a 1 rpm"], answer: 1 },
+                { q: "4. Para que dos engranajes exteriores acoplados giren en el mismo sentido se debe:", options: ["Aumentar el tamaño de la rueda conducida", "Insertar una rueda loca intermediaria", "Usar dientes helicoidales inversos", "Eliminar la lubricación"], answer: 1 },
+                { q: "5. Una polea móvil reduce la fuerza requerida en un factor de:", options: ["1 (Ningún ahorro)", "2 (La mitad de la fuerza)", "4 (Un cuarto de la fuerza)", "10"], answer: 1 }
+            ],
+            3: [
+                { q: "1. ¿Qué representan los Grados de Libertad (GDL) de un mecanismo?", options: ["El peso máximo soportado", "El número de parámetros independientes para definir su posición", "El número de piezas de plástico que contiene", "El ángulo de rozamiento"], answer: 1 },
+                { q: "2. En el criterio de Grübler-Kutzbach para mecanismos planos, un par inferior (j1) restringe:", options: ["1 grado de libertad", "2 grados de libertad", "3 grados de libertad", "0 grados de libertad"], answer: 1 },
+                { q: "3. En una palanca de primer grado, el fulcro (pivote) se ubica:", options: ["En uno de los extremos", "Entre la potencia y la resistencia", "Directamente sobre la potencia", "Fuera del sistema"], answer: 1 },
+                { q: "4. Una carretilla de mano es un ejemplo claro de palanca de:", options: ["Primer grado", "Segundo grado", "Tercer grado", "Cuarto grado"], answer: 1 },
+                { q: "5. Una palanca de tercer grado siempre tiene una Ventaja Mecánica (\(VM\)):", options: ["Mayor a 1", "Igual a 1", "Menor a 1 (Desventaja mecánica de fuerza)", "Infinita"], answer: 2 }
+            ]
+        };
+
+        // Banco de Exámenes Parciales
+        const quizQuestionsData = {
+            1: [
+                { q: "1. Un mecanismo se define principalmente como un conjunto de elementos rígidos dedicados a:", options: ["Transformar y/o transmitir movimientos y fuerzas", "Consumir potencia reactiva", "Producir calor térmico", "Soportar cargas únicamente estáticas"], answer: 0 },
+                { q: "2. El lema o concepto fundamental de una máquina compuesta es:", options: ["Estar formada por un solo operador simple", "La integración de múltiples operadores mecánicos interconectados", "Funcionar sin energía de entrada", "Utilizar únicamente poleas fijas"], answer: 1 },
+                { q: "3. ¿Qué tipo de movimiento realiza la manivela de un motor?", options: ["Lineal alternativo", "Giratorio / Rotativo continuo", "Oscilante en arco", "Rectilíneo uniforme"], answer: 1 },
+                { q: "4. ¿Cuál es el movimiento de salida en el émbolo de un sistema biela-manivela-émbolo?", options: ["Circular continuo", "Lineal alternativo", "Giro helicoidal", "Curvilíneo estático"], answer: 1 },
+                { q: "5. En un polipasto factorial con 4 poleas móviles, la fuerza requerida es:", options: ["F = R / 2", "F = R / 4", "F = R / 8", "F = R / 16"], answer: 2 },
+                { q: "6. Si una polea motriz de D1 = 20 cm gira a N1 = 600 rpm y mueve una polea D2 = 10 cm, la velocidad N2 es:", options: ["300 rpm", "600 rpm", "1200 rpm", "2400 rpm"], answer: 2 },
+                { q: "7. En el ejercicio anterior, el sistema actúa como:", options: ["Reductor de velocidad", "Multiplicador de velocidad", "Inversor de fase", "Polipasto"], answer: 1 },
+                { q: "8. La carrera total (C) desarrollada por un pistón con radio de manivela 'r' es:", options: ["C = r", "C = 2 * r", "C = pi * r", "C = r / 2"], answer: 1 },
+                { q: "9. Los puntos muertos en un mecanismo de biela-manivela ocurren cuando:", options: ["La biela y manivela forman 90 grados", "La biela y manivela están totalmente alineadas (0° o 180°)", "El émbolo sale del cilindro", "La velocidad angular es máxima"], answer: 1 },
+                { q: "10. Para superar mecánicamente las zonas de punto muerto se utiliza frecuentemente:", options: ["Un volante de inercia", "Un segundo émbolo estático", "Una polea móvil extra", "Un piñón cremallera"], answer: 0 },
+                { q: "11. ¿Cuál de las siguientes es una máquina simple de transmisión lineal?", options: ["Engranaje helicoidal", "Polea fija", "Tornillo sinfín", "Tren de engranajes"], answer: 1 },
+                { q: "12. La relación de transmisión 'i' en un sistema cinemático circular se calcula como:", options: ["N1 / N2", "N2 / N1", "D2 / D1", "Z2 / Z1"], answer: 1 },
+                { q: "13. ¿Qué operador mecánico se utilizó históricamente en la antigüedad para elevar agua?", options: ["Tornillo de Arquímedes", "Servomotor", "Cremallera helicoidal", "Cadena dentada"], answer: 0 },
+                { q: "14. La unidad de medida de la velocidad de giro N en el Sistema Técnico de transmisión es:", options: ["m/s", "Revoluciones por minuto (rpm)", "Newtons", "Radianes por segundo cuadrado"], answer: 1 },
+                { q: "15. En una rueda de fricción, la transmisión de movimiento se logra mediante:", options: ["Dientes engranaos", "Fricción o rozamiento entre las superficies en contacto", "Una cadena de eslabones", "Un pivote articulado"], answer: 1 }
+            ],
+            2: [
+                { q: "1. En un piñón-cremallera, si el piñón da 1 vuelta completa, el avance de la cremallera es igual a:", options: ["El diámetro primitivo Dp", "El perímetro primitivo (pi * Dp)", "El paso p", "La mitad del radio"], answer: 1 },
+                { q: "2. Si un piñón tiene 15 dientes y un paso de 4 mm, el avance por vuelta es:", options: ["19 mm", "30 mm", "60 mm", "120 mm"], answer: 2 },
+                { q: "3. La transmisión por cadena piñón-cadena garantiza:", options: ["Que el eje conducido deslice si hay sobrecarga", "Relación de transmisión constante y sin deslizamiento", "Cero necesidad de lubricante", "Un cambio de movimiento a rectilíneo"], answer: 1 },
+                { q: "4. Una desventaja técnica de la cadena frente a la correa trapezoidal es:", options: ["Mayor deslizamiento", "Es más ruidosa y requiere lubricación periódica", "Transmite menor fuerza", "No soporta altas temperaturas"], answer: 1 },
+                { q: "5. En un mecanismo sinfín-corona, si el tornillo es de 2 entradas y la corona tiene 40 dientes, la relación i es:", options: ["2 / 40 = 1 / 20", "40 / 2 = 20", "2 * 40 = 80", "1 / 40"], answer: 0 },
+                { q: "6. La irreversibilidad del tornillo sinfín significa que:", options: ["Solo gira en sentido horario", "El tornillo puede mover a la corona, pero la corona no mueve al tornillo", "No se puede reparar si se rompe", "Gira a velocidad infinita"], answer: 1 },
+                { q: "7. Un engranaje de Z1 = 12 dientes impulsa a Z2 = 36 dientes. Si N1 = 900 rpm, N2 vale:", options: ["300 rpm", "2700 rpm", "1800 rpm", "100 rpm"], answer: 0 },
+                { q: "8. En el problema anterior, el sentido de giro de la rueda conducida Z2 respecto a Z1 es:", options: ["El mismo sentido", "Sentido opuesto", "Perpendicular", "No gira"], answer: 1 },
+                { q: "9. ¿Qué función cumple una rueda dentada 'loca' en un tren simple de engranajes?", options: ["Aumentar la velocidad final", "Invertir el sentido de giro sin alterar la relación de transmisión final", "Reducir el torque a cero", "Bloquear el sistema"], answer: 1 },
+                { q: "10. En un tren compuesto de engranajes, la velocidad final depende de:", options: ["Solo la primera y última rueda", "El producto de dientes de ruedas conductoras dividido entre conducidas", "La suma de todos los dientes", "El ancho de la cadena"], answer: 1 },
+                { q: "11. Una polea fija proporciona una Ventaja Mecánica (VM) de:", options: ["0.5", "1", "2", "Infinita"], answer: 1 },
+                { q: "12. Una polea móvil reduce la fuerza aplicada debido a que:", options: ["Elimina la gravedad", "La carga es soportada por dos tramos paralelos de la cuerda", "Aumenta la velocidad de elevación", "Utiliza engranajes internos"], answer: 1 },
+                { q: "13. En un polipasto potencial con n=3 poleas móviles, la fuerza F para mover R=800 N es:", options: ["F = 800 / 3 = 266.6 N", "F = 800 / (2^3) = 800 / 8 = 100 N", "F = 800 / 6 = 133.3 N", "F = 800 N"], answer: 1 },
+                { q: "14. El módulo 'm' en un engranaje es la relación entre:", options: ["Diámetro primitivo y número de dientes (Dp / Z)", "Número de dientes y pi", "Paso y fuerza", "Torque y rpm"], answer: 0 },
+                { q: "15. Para montar dos engranajes en contacto directo es condición indispensable que tengan:", options: ["El mismo número de dientes", "El mismo módulo y paso", "Diferente material de fabricación", "El mismo diámetro externo"], answer: 1 }
+            ],
+            3: [
+                { q: "1. ¿Qué ecuación representa el criterio de Grübler-Kutzbach para mecanismos planos?", options: ["M = 3*(n - 1) - 2*j1 - j2", "M = 2*(n - 1) - 3*j1", "M = n - j1 - j2", "M = 6*n - 5*j1"], answer: 0 },
+                { q: "2. En la ecuación de Grübler, el término 'n' representa:", options: ["El número de motores", "El número total de eslabones (incluyendo el bastidor fijo)", "El número de dientes", "La velocidad angular"], answer: 1 },
+                { q: "3. Una articulación de revolución (pasador plano) se clasifica como junta de tipo:", options: ["j1 (1 grado de libertad permitido, restringe 2)", "j2 (2 grados de libertad permitidos)", "j0", "j3"], answer: 0 },
+                { q: "4. Un mecanismo de 4 barras con n=4 y j1=4 tiene un grado de movilidad M igual a:", options: ["0", "1", "2", "3"], answer: 1 },
+                { q: "5. Si el cálculo del grado de libertad resulta M = 0, el sistema cinemático es:", options: ["Un mecanismo con movimiento libre", "Una estructura estáticamente determinada (rígida)", "Un mecanismo hipermóvil", "Un motor síncrono"], answer: 1 },
+                { q: "6. En la Ley de la Palanca (P * bp = R * br), el término 'bp' representa:", options: ["El peso del pivote", "El brazo de potencia (distancia del pivote a la fuerza P)", "El brazo de resistencia", "La longitud total de la barra"], answer: 1 },
+                { q: "7. Una palanca de primer grado se caracteriza por tener:", options: ["La resistencia en el centro", "El punto de apoyo (fulcro) entre la potencia y la resistencia", "La potencia en el centro", "El pivote en un extremo libre"], answer: 1 },
+                { q: "8. ¿Cuál de los siguientes objetos es una palanca de primer grado?", options: ["Una carretilla de carga", "Unas tijeras", "Unas pinzas de depilar", "Un cascanueces"], answer: 1 },
+                { q: "9. En una palanca de segundo grado, la Ventaja Mecánica (VM) siempre es:", options: ["Menor a 1", "Igual a 1", "Mayor a 1 (Siempre ahorra fuerza)", "Cero"], answer: 2 },
+                { q: "10. Las pinzas de hielo o el cuerpo humano (bíceps) son ejemplos de palanca de:", options: ["Primer grado", "Segundo grado", "Tercer grado", "Cuarto grado"], answer: 2 },
+                { q: "11. Si una palanca tiene bp = 2 m y br = 0.5 m, su Ventaja Mecánica es:", options: ["0.25", "2.5", "4", "1"], answer: 2 },
+                { q: "12. Para levantar una carga R = 600 N con la palanca del ejercicio anterior, la fuerza P requerida es:", options: ["1200 N", "300 N", "150 N", "600 N"], answer: 2 },
+                { q: "13. La barrera de un paso de nivel vehicular se modela comúnmente como un mecanismo de:", options: ["1 grado de libertad", "0 grados de libertad", "3 grados de libertad", "Irreversibilidad helicoidal"], answer: 0 },
+                { q: "14. La ventaja de las palancas de tercer grado (VM < 1) radica en que permiten:", options: ["Ahorrar mucha fuerza muscular", "Ganar velocidad, precisión y amplitud de movimiento en el extremo", "Elevar cargas infinitas", "Eliminar el fulcro"], answer: 1 },
+                { q: "15. En una palanca en equilibrio, si duplicamos el brazo de potencia (bp) manteniendo br y R constantes, la fuerza P necesaria:", options: ["Se duplica", "Se reduce a la mitad", "Permanecerá igual", "Se cuadruplica"], answer: 1 }
+            ]
+        };
+
+        function renderAllForms() {
+            // Render Diagnósticos
+            for (let p = 1; p <= 3; p++) {
+                const container = document.getElementById(`diag${p}-questions`);
+                if (!container) continue;
+                container.innerHTML = '';
+
+                diagQuestionsData[p].forEach((qData, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let optionsHTML = '';
+                    qData.options.forEach((opt, optIdx) => {
+                        optionsHTML += `
+                            <label class="quiz-option">
+                                <input type="radio" name="d${p}_q${index}" value="${optIdx}">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${optionsHTML}</div>`;
+                    container.appendChild(qDiv);
+                });
+            }
+
+            // Render Exámenes
+            for (let p = 1; p <= 3; p++) {
+                const container = document.getElementById(`quiz${p}-questions`);
+                if (!container) continue;
+                container.innerHTML = '';
+
+                quizQuestionsData[p].forEach((qData, index) => {
+                    const qDiv = document.createElement('div');
+                    qDiv.className = 'quiz-question';
+                    let optionsHTML = '';
+                    qData.options.forEach((opt, optIdx) => {
+                        optionsHTML += `
+                            <label class="quiz-option">
+                                <input type="radio" name="p${p}_q${index}" value="${optIdx}">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                    qDiv.innerHTML = `<p>${qData.q}</p><div class="quiz-options">${optionsHTML}</div>`;
+                    container.appendChild(qDiv);
+                });
+            }
+        }
+
+        function evaluateDiag(pNum) {
+            const data = diagQuestionsData[pNum];
+            let score = 0;
+            data.forEach((qData, index) => {
+                const selected = document.querySelector(`input[name="d${pNum}_q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qData.answer) {
+                    score++;
+                }
+            });
+
+            userData.diagScores[pNum] = score;
+
+            const resultBox = document.getElementById(`resultDiag${pNum}`);
+            resultBox.style.display = 'block';
+            const grade = ((score / data.length) * 10).toFixed(1);
+            resultBox.innerHTML = `
+                <h3>Resultados Diagnóstico Parcial ${pNum}: ${score} / ${data.length} (${grade}/10)</h3>
+                <p>Resultado registrado para medir conocimientos previos de este bloque.</p>
+            `;
+
+            updateReportTable();
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function evaluateQuiz(pNum) {
+            const data = quizQuestionsData[pNum];
+            let score = 0;
+            data.forEach((qData, index) => {
+                const selected = document.querySelector(`input[name="p${pNum}_q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qData.answer) {
+                    score++;
+                }
+            });
+
+            userData.quizScores[pNum] = score;
+
+            const resultBox = document.getElementById(`resultQuiz${pNum}`);
+            resultBox.style.display = 'block';
+            const grade = ((score / data.length) * 10).toFixed(1);
+            resultBox.innerHTML = `
+                <h3>Calificación Examen Parcial ${pNum}: ${score} / ${data.length} (${grade}/10)</h3>
+                <p>Examen sumativo registrado exitosamente.</p>
+            `;
+
+            updateReportTable();
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateReportTable() {
+            document.getElementById('repNombre').textContent = userData.nombre || 'No registrado';
+
+            const d = new Date();
+            document.getElementById('reportDate').textContent = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+
+            // Actualizar Diagnósticos
+            const d1 = userData.diagScores[1];
+            const d2 = userData.diagScores[2];
+            const d3 = userData.diagScores[3];
+
+            document.getElementById('repD1Score').textContent = `${d1} / 5`;
+            document.getElementById('repD2Score').textContent = `${d2} / 5`;
+            document.getElementById('repD3Score').textContent = `${d3} / 5`;
+
+            document.getElementById('repD1Grade').textContent = ((d1 / 5) * 10).toFixed(1);
+            document.getElementById('repD2Grade').textContent = ((d2 / 5) * 10).toFixed(1);
+            document.getElementById('repD3Grade').textContent = ((d3 / 5) * 10).toFixed(1);
+
+            // Actualizar Exámenes
+            const q1 = userData.quizScores[1];
+            const q2 = userData.quizScores[2];
+            const q3 = userData.quizScores[3];
+
+            document.getElementById('repP1Score').textContent = `${q1} / 15`;
+            document.getElementById('repP2Score').textContent = `${q2} / 15`;
+            document.getElementById('repP3Score').textContent = `${q3} / 15`;
+
+            const g1 = ((q1 / 15) * 10).toFixed(1);
+            const g2 = ((q2 / 15) * 10).toFixed(1);
+            const g3 = ((q3 / 15) * 10).toFixed(1);
+
+            document.getElementById('repP1Grade').textContent = g1;
+            document.getElementById('repP2Grade').textContent = g2;
+            document.getElementById('repP3Grade').textContent = g3;
+
+            const prom = ((parseFloat(g1) + parseFloat(g2) + parseFloat(g3)) / 3).toFixed(1);
+            document.getElementById('repPromedio').textContent = `${prom} / 10`;
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('reportPrintArea');
+            const opt = {
+                margin:       0.5,
+                filename:     `Reporte_Mecanismos_${userData.nombre || 'Alumno'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function switchParcial(id, btn) {
+            const contents = document.querySelectorAll('.parcial-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+
+            updateSidebar(id);
+        }
+
+        /* --- CÓDIGO DE SIMULADORES CANVAS INTERACTIVOS --- */
+
+        // 1. SIMULADOR POLEAS DE TRANSMISIÓN
+        let anglePoleas = 0;
+        function drawPoleas() {
+            const canvas = document.getElementById('canvasPoleas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const d1 = parseFloat(document.getElementById('sliderD1').value);
+            const d2 = parseFloat(document.getElementById('sliderD2').value);
+
+            document.getElementById('valD1').textContent = d1;
+            document.getElementById('valD2').textContent = d2;
+
+            const n1 = 1200;
+            const n2 = Math.round((n1 * d1) / d2);
+            document.getElementById('simN2').textContent = n2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const x1 = 100, y1 = 100, r1 = d1 * 1.8;
+            const x2 = 330, y2 = 100, r2 = d2 * 1.8;
+
+            // Correa
+            ctx.beginPath();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 4;
+            ctx.moveTo(x1, y1 - r1); ctx.lineTo(x2, y2 - r2);
+            ctx.moveTo(x1, y1 + r1); ctx.lineTo(x2, y2 + r2);
+            ctx.stroke();
+
+            // Polea 1
+            ctx.beginPath();
+            ctx.arc(x1, y1, r1, 0, Math.PI * 2);
+            ctx.fillStyle = '#0284c7'; ctx.fill();
+            ctx.strokeStyle = '#f8fafc'; ctx.lineWidth = 2; ctx.stroke();
+
+            // Marca giro 1
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x1 + r1 * Math.cos(anglePoleas), y1 + r1 * Math.sin(anglePoleas));
+            ctx.strokeStyle = '#ffffff'; ctx.stroke();
+
+            // Polea 2
+            const angle2 = anglePoleas * (d1 / d2);
+            ctx.beginPath();
+            ctx.arc(x2, y2, r2, 0, Math.PI * 2);
+            ctx.fillStyle = '#fb923c'; ctx.fill();
+            ctx.strokeStyle = '#f8fafc'; ctx.lineWidth = 2; ctx.stroke();
+
+            // Marca giro 2
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 + r2 * Math.cos(angle2), y2 + r2 * Math.sin(angle2));
+            ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        }
+
+        // 2. SIMULADOR BIELA MANIVELA
+        let angleBiela = 0;
+        let isBielaRunning = true;
+        function toggleBielaSim() { isBielaRunning = !isBielaRunning; }
+
+        function drawBiela() {
+            const canvas = document.getElementById('canvasBiela');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const r = parseFloat(document.getElementById('sliderR').value);
+            const L = 100; // Longitud biela fija
+
+            document.getElementById('valR').textContent = r;
+            document.getElementById('simCarrera').textContent = r * 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const ox = 100, oy = 90;
+            const mx = ox + r * Math.cos(angleBiela);
+            const my = oy + r * Math.sin(angleBiela);
+
+            // Posición pistón en x
+            const px = ox + Math.sqrt(L*L - Math.pow(r*Math.sin(angleBiela), 2)) + r*Math.cos(angleBiela);
+            const py = oy;
+
+            // Guía del pistón
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(170, 70, 180, 40);
+
+            // Manivela
+            ctx.beginPath();
+            ctx.moveTo(ox, oy); ctx.lineTo(mx, my);
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 6; ctx.stroke();
+
+            // Biela
+            ctx.beginPath();
+            ctx.moveTo(mx, my); ctx.lineTo(px, py);
+            ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 4; ctx.stroke();
+
+            // Émbolo/Pistón
+            ctx.fillStyle = '#fb923c';
+            ctx.fillRect(px - 15, py - 12, 30, 24);
+
+            // Juntas
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath(); ctx.arc(ox, oy, 4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI*2); ctx.fill();
+        }
+
+        // 3. SIMULADOR ENGRANAJES
+        let angleEngranes = 0;
+        function drawEngranes() {
+            const canvas = document.getElementById('canvasEngranes');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const z1 = parseFloat(document.getElementById('sliderZ1').value);
+            const z2 = parseFloat(document.getElementById('sliderZ2').value);
+
+            document.getElementById('valZ1').textContent = z1;
+            document.getElementById('valZ2').textContent = z2;
+            document.getElementById('simI').textContent = (z1 / z2).toFixed(2);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const r1 = z1 * 4;
+            const r2 = z2 * 4;
+            const x1 = 120;
+            const y1 = 100;
+            const x2 = x1 + r1 + r2;
+            const y2 = 100;
+
+            // Engranaje 1
+            ctx.beginPath(); ctx.arc(x1, y1, r1, 0, Math.PI*2);
+            ctx.fillStyle = '#0284c7'; ctx.fill(); ctx.stroke();
+
+            // Engranaje 2
+            ctx.beginPath(); ctx.arc(x2, y2, r2, 0, Math.PI*2);
+            ctx.fillStyle = '#4ade80'; ctx.fill(); ctx.stroke();
+
+            // Marcas
+            ctx.beginPath(); ctx.moveTo(x1, y1);
+            ctx.lineTo(x1 + r1*Math.cos(angleEngranes), y1 + r1*Math.sin(angleEngranes));
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+
+            const angle2 = -angleEngranes * (z1 / z2);
+            ctx.beginPath(); ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 + r2*Math.cos(angle2), y2 + r2*Math.sin(angle2));
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+        }
+
+        // 4. SIMULADOR PALANCA
+        function drawPalanca() {
+            const canvas = document.getElementById('canvasPalanca');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const fulcroX = parseFloat(document.getElementById('sliderFulcro').value);
+            const R = parseFloat(document.getElementById('sliderRSim').value);
+            document.getElementById('valRSim').textContent = R;
+
+            const bp = fulcroX - 50;
+            const br = 400 - fulcroX;
+
+            const P = Math.round((R * br) / bp);
+            const vm = (bp / br).toFixed(2);
+
+            document.getElementById('simFuerzaP').textContent = P;
+            document.getElementById('simVM').textContent = vm;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Barra rígida
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(40, 90, 370, 10);
+
+            // Fulcro (Triángulo)
+            ctx.beginPath();
+            ctx.moveTo(fulcroX, 100);
+            ctx.lineTo(fulcroX - 15, 130);
+            ctx.lineTo(fulcroX + 15, 130);
+            ctx.closePath();
+            ctx.fillStyle = '#fb923c';
+            ctx.fill();
+
+            // Fuerza Potencia P (Flecha en x=50)
+            ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(50, 30); ctx.lineTo(50, 85); ctx.stroke();
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath(); ctx.moveTo(43, 80); ctx.lineTo(50, 90); ctx.lineTo(57, 80); ctx.fill();
+            ctx.fillText(`P = ${P}N`, 35, 20);
+
+            // Fuerza Resistencia R (Flecha en x=400)
+            ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(400, 30); ctx.lineTo(400, 85); ctx.stroke();
+            ctx.fillStyle = '#4ade80';
+            ctx.beginPath(); ctx.moveTo(393, 80); ctx.lineTo(400, 90); ctx.lineTo(407, 80); ctx.fill();
+            ctx.fillText(`R = ${R}N`, 385, 20);
+        }
+
+        // Bucle de animación para simuladores gráficos
+        function animateSimulators() {
+            if (isBielaRunning) {
+                angleBiela += 0.05;
+                anglePoleas += 0.05;
+                angleEngranes += 0.03;
+            }
+            drawPoleas();
+            drawBiela();
+            drawEngranes();
+            drawPalanca();
+            requestAnimationFrame(animateSimulators);
+        }
+
+        window.onload = function() {
+            renderAllForms();
+            updateSidebar('parcial1');
+            animateSimulators();
+        };
+    </script>
+</body>
+</html>
