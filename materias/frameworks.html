@@ -694,23 +694,99 @@ p.saludar();</code></pre>
 
                 <section id="p2-metodos" class="card">
                     <h2>1. Métodos en Java</h2>
-                    <p>Un <strong>método</strong> es un conjunto de instrucciones agrupadas bajo un nombre que realizan una tarea específica. Promueven la reutilización de código y la modularidad.</p>
-                    <ul>
-                        <li><strong>Modificador de Acceso:</strong> Define la visibilidad (<code>public</code>, <code>private</code>, <code>protected</code>).</li>
-                        <li><strong>Tipo de Retorno:</strong> Especifica el dato devuelto (<code>int</code>, <code>String</code>, etc.) o <code>void</code> si no retorna nada.</li>
-                        <li><strong>Parámetros:</strong> Variables recibidas entre paréntesis.</li>
-                    </ul>
-<pre><code><span class="keyword">public class</span> <span class="class-name">Calculadora</span> {
-    <span class="comment">// Método con retorno y parámetros</span>
-    <span class="keyword">public int</span> <span class="method">sumar</span>(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
-        <span class="keyword">return</span> a + b;
+                    <p>Un <strong>método</strong> es un bloque de código que realiza una tarea específica. Permite organizar y reutilizar instrucciones dentro de un programa.</p>
+
+                    <div class="analogy">
+                        💡 <strong>Idea principal:</strong> Un método permite escribir una tarea una vez y utilizarla las veces que sea necesario.
+                    </div>
+
+                    <h3>Ejemplo: sumar dos números</h3>
+                    <p>En este ejemplo crearemos un solo método llamado <code>sumar()</code>. El programa solicita dos números por teclado, los envía al método, realiza la suma y recibe el resultado.</p>
+
+<pre><code><span class="keyword">package</span> com.mycompany.sumadnumeros;
+
+<span class="keyword">import</span> java.util.Scanner;
+
+<span class="keyword">public class</span> <span class="class-name">SumaDosNumeros</span> {
+
+    <span class="comment">// Método para sumar dos números</span>
+    <span class="keyword">public static int</span> <span class="method">sumar</span>(<span class="keyword">int</span> numero1, <span class="keyword">int</span> numero2) {
+
+        <span class="keyword">return</span> numero1 + numero2;
+
     }
 
-    <span class="comment">// Método sin retorno (void)</span>
-    <span class="keyword">public void</span> <span class="method">mostrarMensaje</span>(String msg) {
-        System.out.<span class="method">println</span>(<span class="string">"Mensaje: "</span> + msg);
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+
+        Scanner teclado = <span class="keyword">new</span> Scanner(System.in);
+
+        System.out.<span class="method">print</span>(<span class="string">"Introduce el primer número: "</span>);
+        <span class="keyword">int</span> numero1 = teclado.<span class="method">nextInt</span>();
+
+        System.out.<span class="method">print</span>(<span class="string">"Introduce el segundo número: "</span>);
+        <span class="keyword">int</span> numero2 = teclado.<span class="method">nextInt</span>();
+
+        <span class="comment">// Llamada al método</span>
+        <span class="keyword">int</span> resultado = <span class="method">sumar</span>(numero1, numero2);
+
+        System.out.<span class="method">println</span>(<span class="string">"La suma es: "</span> + resultado);
+
+        teclado.<span class="method">close</span>();
     }
 }</code></pre>
+
+                    <h3>¿Cómo funciona?</h3>
+                    <ol>
+                        <li>El programa solicita el primer número.</li>
+                        <li>Solicita el segundo número.</li>
+                        <li>Se llama al método <code>sumar(numero1, numero2)</code>.</li>
+                        <li>El método recibe los dos números.</li>
+                        <li>Realiza la operación <code>numero1 + numero2</code>.</li>
+                        <li><code>return</code> devuelve el resultado.</li>
+                        <li>El resultado se muestra en pantalla.</li>
+                    </ol>
+
+                    <h3>La parte más importante: el método</h3>
+<pre><code><span class="keyword">public static int</span> <span class="method">sumar</span>(<span class="keyword">int</span> numero1, <span class="keyword">int</span> numero2) {
+
+    <span class="keyword">return</span> numero1 + numero2;
+
+}</code></pre>
+
+                    <div class="analogy">
+                        <strong>public</strong> = acceso público.<br>
+                        <strong>static</strong> = podemos llamarlo directamente desde <code>main()</code>.<br>
+                        <strong>int</strong> = el método devuelve un número entero.<br>
+                        <strong>sumar</strong> = nombre del método.<br>
+                        <strong>(int numero1, int numero2)</strong> = parámetros que recibe.<br>
+                        <strong>return</strong> = devuelve el resultado.
+                    </div>
+
+                    <h3>Ejemplo de ejecución</h3>
+<pre><code>Introduce el primer número: 10
+Introduce el segundo número: 5
+La suma es: 15</code></pre>
+
+                    <div class="analogy">
+                        💡 <strong>Importante:</strong> Este ejemplo NO utiliza sobrecarga. Solo existe un método llamado <code>sumar()</code> con dos parámetros de tipo <code>int</code>.
+                    </div>
+
+                    <h3>Flujo del programa</h3>
+<pre><code>numero1 = 10
+numero2 = 5
+      ↓
+sumar(numero1, numero2)
+      ↓
+10 + 5
+      ↓
+return 15
+      ↓
+resultado = 15
+      ↓
+La suma es: 15</code></pre>
+
+                    <h3>Actividad</h3>
+                    <p>Modifica el programa para que, además de sumar, el alumno pueda cambiar los valores introducidos por teclado y comprobar diferentes resultados.</p>
                 </section>
 
                 <section id="p2-sobrecarga" class="card">
